@@ -17,7 +17,6 @@ if [ "$?" -ne "0" ]; then
     ./configure --prefix=/usr
     make && make install
     cd ~
-    rm -r protobuf-2.5.0
  fi
 
 # Test for hci0
