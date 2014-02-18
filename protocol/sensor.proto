@@ -3,13 +3,13 @@ package sensor;
 option java_package = "no.ntnu.eit.skeis.protocol";
 option java_outer_classname = "SensorProtos";
 
-// Message sent by sensor to sentral upon connecting
+// Message sent by sensor to central upon connecting
 message SensorRegisterRequest {
     required int64 client_version = 1;
     required string client_alias = 2;
 }
 
-// Response sent by server after a register request
+// Response sent by central after a register request
 message SensorRegisterResponse {
     required int64 server_version = 1;
 
