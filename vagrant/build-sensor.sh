@@ -12,9 +12,10 @@ which protoc
 if [ "$?" -ne "0" ]; then
     cd ~
     wget https://protobuf.googlecode.com/files/protobuf-2.5.0.tar.bz2
+    tar xvf protobuf-2.5.0.tar.bz2
     cd protobuf-2.5.0
     ./configure --prefix=/usr
-    make && make instal
+    make && make install
     cd ~
     rm -r protobuf-2.5.0
  fi
@@ -26,7 +27,7 @@ if [ "$?" -ne "0" ]; then
     echo "Unable to bring bluetooth up, is USB filter configured?"
     exit 1
 fi
- 
+
 # Build our project
 cd /source
 make
