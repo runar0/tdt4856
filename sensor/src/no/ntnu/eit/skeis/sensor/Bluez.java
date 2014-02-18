@@ -21,11 +21,13 @@ public class Bluez {
 	
 	private static boolean running = false;	
 	private static Thread readThread;
+	private static boolean stopping = false;
 	
 	public static void startScan(final ResponseListener listener) throws IOException {
 		if (running) {
 			throw new IOException("Scan already started!");
 		}
+		stopping = false;
 
 		Logger.getLogger("Bluez").finest("Attempting to enable periodic bluetooth scan");
 		
@@ -72,6 +74,10 @@ public class Bluez {
 						}
 					}
 					
+					if (!stopping) {
+						Logger.getLogger("Bluez - Read Thread").warning("Thread stopping before stop was called!");
+					}
+					
 				} catch(IOException e) {
 					System.err.println("Exception in bluetooth read thread!");
 					e.printStackTrace();
@@ -88,6 +94,8 @@ public class Bluez {
 		if(!running) {
 			return;
 		}
+		
+		stopping = true;
 		
 		// Start periodic can mode
 		Process p = Runtime.getRuntime().exec("hcitool cmd 01 0004");		
