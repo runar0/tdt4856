@@ -1,6 +1,7 @@
 package no.ntnu.eit.skeis.sensor;
 
 import java.io.IOException;
+import java.util.logging.Logger;
 
 /**
  * Sensor emulation
@@ -9,6 +10,10 @@ import java.io.IOException;
  */
 public class Sensor implements Bluez.ResponseListener {
 
+	final Logger log;
+	
+	public volatile boolean running;
+	
 	/**
 	 * Client version. 
 	 * 
@@ -22,7 +27,27 @@ public class Sensor implements Bluez.ResponseListener {
 			System.out.println("Usage: sensor central-ip central-port client-alias");
 			System.exit(1);
 		}
-		new Sensor(args[0], Integer.parseInt(args[1]), args[2]);
+		while(true) {
+			Sensor s;
+			try {
+				s = new Sensor(args[0], Integer.parseInt(args[1]), args[2]);
+				
+				while(s.running) {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
+						
+					}
+				}
+			} catch(Exception e) {
+				Logger.getGlobal().info("Exception when starting sensor, probably a connection error.");
+				e.printStackTrace();
+				try {
+					Thread.sleep(1000);
+				} catch(Exception ex) {}
+			}
+			
+		}
 	}
 	
 	private CentralConnection central;
@@ -32,7 +57,9 @@ public class Sensor implements Bluez.ResponseListener {
 	 * @throws Exception
 	 */
 	public Sensor(String ip, int port, String alias) throws Exception {
+		log = Logger.getLogger("Sensor");
 		central = new CentralConnection(ip, port, alias);
+		running = true;
 		Bluez.startScan(this);
 	}
 
@@ -46,13 +73,13 @@ public class Sensor implements Bluez.ResponseListener {
 		try {
 			central.sendSensorUpdate(mac, rssi);
 		} catch(IOException e) {
-			e.printStackTrace();
+			this.running = false;
+			log.info("Central gone away.");
 			try {
 				Bluez.stopScan();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			System.exit(1);
 		}
 		
 	}
