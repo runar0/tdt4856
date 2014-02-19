@@ -65,6 +65,7 @@ public class CentralConnection {
 			log.info("Central accepted our connection: "+response.getStatusMessage());
 		} else {
 			log.info("Central denied our connection: "+response.getStatusMessage());
+			System.exit(1);
 		}
 	}
 	
