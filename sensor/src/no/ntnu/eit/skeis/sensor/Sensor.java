@@ -12,6 +12,8 @@ public class Sensor implements Bluez.ResponseListener {
 
 	final Logger log;
 	
+	public volatile boolean running;
+	
 	/**
 	 * Client version. 
 	 * 
@@ -26,12 +28,26 @@ public class Sensor implements Bluez.ResponseListener {
 			System.exit(1);
 		}
 		while(true) {
+			Sensor s;
 			try {
-				new Sensor(args[0], Integer.parseInt(args[1]), args[2]);
+				s = new Sensor(args[0], Integer.parseInt(args[1]), args[2]);
+				
+				while(s.running) {
+					try {
+						Thread.sleep(1000);
+					} catch(Exception e) {
+						
+					}
+				}
 			} catch(Exception e) {
+				Logger.getGlobal().info("Exception when starting sensor, probably a connection error.");
 				e.printStackTrace();
+				try {
+					Thread.sleep(1000);
+				} catch(Exception ex) {}
 			}
-		}			
+			
+		}
 	}
 	
 	private CentralConnection central;
@@ -43,6 +59,7 @@ public class Sensor implements Bluez.ResponseListener {
 	public Sensor(String ip, int port, String alias) throws Exception {
 		log = Logger.getLogger("Sensor");
 		central = new CentralConnection(ip, port, alias);
+		running = true;
 		Bluez.startScan(this);
 	}
 
@@ -56,13 +73,13 @@ public class Sensor implements Bluez.ResponseListener {
 		try {
 			central.sendSensorUpdate(mac, rssi);
 		} catch(IOException e) {
+			this.running = false;
 			log.info("Central gone away.");
 			try {
 				Bluez.stopScan();
 			} catch (IOException e1) {
 				e1.printStackTrace();
 			}
-			System.exit(1);
 		}
 		
 	}

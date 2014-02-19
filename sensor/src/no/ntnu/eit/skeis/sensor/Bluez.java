@@ -25,7 +25,7 @@ public class Bluez {
 	
 	public static void startScan(final ResponseListener listener) throws IOException {
 		if (running) {
-			throw new IOException("Scan already started!");
+			//throw new IOException("Scan already started!");
 		}
 		stopping = false;
 
