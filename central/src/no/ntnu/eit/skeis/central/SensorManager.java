@@ -1,16 +1,14 @@
 package no.ntnu.eit.skeis.central;
 
-import java.net.ServerSocket;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorUpdate;
+import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
-public class SensorManager extends Thread {
+public class SensorManager {
 
 	interface SensorEventListener {
 		public void onSensorAttach(String alias);
@@ -21,43 +19,14 @@ public class SensorManager extends Thread {
 	private Map<String, SensorConnection> sensors;
 	private Logger log;
 	
-	private int port;
-	
 	private Set<SensorEventListener> listeners;
 	
-	public SensorManager(int port) {
+	public SensorManager() {
 		listeners = new HashSet<SensorEventListener>();
 		sensors = new HashMap<String, SensorConnection>();
-		this.port = port;
 		log = Logger.getLogger("SensorManager");
 	}
-	
-	@Override
-	public void run() {
-		try {
-			ServerSocket ss = new ServerSocket(12354);
-			Socket s;
-			
-			log.info("Server active on port 12354");
-			
-			while((s = ss.accept()) != null) {
-				SensorConnection sensor = null;
-				try {
-					sensor = new SensorConnection(this, s);
-				} catch(Exception e) {
-					log.info("Exception in sensor connection, dropping client");
-					if(sensor != null) {
-						removeSensor(sensor.getAlias());
-					}
-				}
-			}
-		} catch(Exception e) {
-			log.info("Exception in SensorManager, killing central");
-			e.printStackTrace();
-			System.exit(1);
-		}
-	}
-	
+		
 	/**
 	 * Get a set of all current sensor aliases
 	 * 
@@ -100,10 +69,6 @@ public class SensorManager extends Thread {
 		for (SensorEventListener listener : listeners) {
 			listener.onSensorUpdate(source.getAlias(), update.getUnitMac(), update.getRssi());
 		}
-	}
-
-	public int getListenPort() {
-		return port;
 	}
 	
 }

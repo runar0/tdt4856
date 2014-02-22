@@ -1,0 +1,28 @@
+package device;
+
+option java_package = "no.ntnu.eit.skeis.protocol";
+option java_outer_classname = "DeviceProtos";
+
+// Message sent by device to central upon connecting
+message DeviceRegisterRequest {
+    required int64 device_version = 1;
+    required string device_alias = 2;
+    
+    enum DeviceType {
+        SENSOR = 1;
+        PLAYER = 2;
+    }
+    required DeviceType device_type = 3;
+}
+
+// Response sent by central after a register request
+message DeviceRegisterResponse {
+    required int64 server_version = 1;
+
+    enum StatusCodes {
+        OK = 0;
+        DENIED = 1;
+    }
+    required StatusCodes status = 2;
+    optional string status_message = 3;
+}

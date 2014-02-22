@@ -29,15 +29,15 @@ public class Beacon extends Thread {
 	/**
 	 * Time in ms between beacon packages
 	 */
-	private static final long BEACON_GAP = 30*1000;
+	private static final long BEACON_GAP = 5*1000;
 	
-	private Central central;
 	private boolean running;
+	private DeviceServerSocket server;
 	
 	private Logger log;
 	
-	public Beacon(Central central) {
-		this.central = central;
+	public Beacon(DeviceServerSocket server) {
+		this.server = server;
 		log = Logger.getLogger(getClass().getName());
 	}
 	
@@ -64,8 +64,8 @@ public class Beacon extends Thread {
 			try {
 				CentralBeacon beaconPackage = CentralBeacon.newBuilder()
 						.setServerVersion(Central.VERSION)
-						.setSensorPort(central.getSensorManager().getListenPort())
-						.setPlayerPort(1234)
+						.setSensorPort(server.getPort())
+						.setPlayerPort(server.getPort())
 						.build();
 				ByteArrayOutputStream data = new ByteArrayOutputStream();
 				beaconPackage.writeDelimitedTo(data);

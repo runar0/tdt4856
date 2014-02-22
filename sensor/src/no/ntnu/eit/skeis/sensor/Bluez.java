@@ -85,6 +85,7 @@ public class Bluez {
 			}
 		};
 		running = true;
+		readThread.setDaemon(false);
 		readThread.start();
 	}
 	

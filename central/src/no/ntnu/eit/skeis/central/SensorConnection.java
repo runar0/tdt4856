@@ -1,14 +1,12 @@
 package no.ntnu.eit.skeis.central;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.Socket;
 import java.util.logging.Logger;
 
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorRegisterRequest;
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorRegisterResponse;
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorUpdate;
+import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 /**
  * SensorConnection
@@ -22,46 +20,21 @@ public class SensorConnection {
 	private final Logger log;
 	private final SensorManager manager;
 	
-	private Socket s;
-	private BufferedInputStream in;
-	private BufferedOutputStream out;
+	private InputStream in;
+	private OutputStream out;
 	
 	private String alias;
 	
 	private Thread readThread;
 	
 	
-	public SensorConnection(SensorManager manager, Socket s) {
-		log = Logger.getLogger("SensorConnection["+s.getInetAddress()+"]");
+	public SensorConnection(SensorManager manager, String alias, InputStream in, OutputStream out) {
+		log = Logger.getLogger(getClass().getName());
+		this.alias = alias;
+		this.in = in;
+		this.out = out;
 		this.manager = manager;
-		try {
-			log.info("Sensor connection initializing");
-			in = new BufferedInputStream(s.getInputStream());
-			out = new BufferedOutputStream(s.getOutputStream());
-			
-			SensorRegisterRequest request = SensorRegisterRequest.parseDelimitedFrom(in);
-			
-			if(request.getClientVersion() == Central.VERSION) {
-				Logger.getLogger("Central").info("Client "+request.getClientAlias()+" connected from "+s.getInetAddress());
-				SensorRegisterResponse.newBuilder()
-					.setStatus(SensorRegisterResponse.StatusCodes.OK)
-					.setServerVersion(Central.VERSION)
-					.setStatusMessage("Welcome")
-					.build().writeDelimitedTo(out);
-				out.flush();			
-				
-				alias = request.getClientAlias();
-				manager.addSensor(request.getClientAlias(), this);
-				startReadLoop();
-			} else {
-				System.err.println("Invalid version");
-				System.exit(1);
-			}
-			
-		} catch(IOException e) {
-			log.warning("Unable to open sensor connection");
-			log.warning(e.toString());
-		}
+		startReadLoop();
 	}
 	
 	public String getAlias() {
@@ -70,7 +43,7 @@ public class SensorConnection {
 	
 	/**
 	 * Start a read thread that continues to read sensor updates until the stream is
-	 * closed. On every update read a message is sent to the central for futher 
+	 * closed. On every update read a message is sent to the central for further 
 	 * processing.
 	 * 
 	 */
@@ -90,6 +63,7 @@ public class SensorConnection {
 						manager.onSensorUpdate(sensor, update);						
 					} catch(IOException ioe) {
 						log.info("Excpetion in read loop, dropping sensor");
+						log.warning(ioe.toString());
 						manager.removeSensor(alias);
 						return;
 					}

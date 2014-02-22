@@ -7,10 +7,10 @@ import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Logger;
 
-import no.ntnu.eit.skeis.protocol.SensorProtos;
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorRegisterRequest;
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorRegisterResponse;
-import no.ntnu.eit.skeis.protocol.SensorProtos.SensorUpdate;
+import no.ntnu.eit.skeis.protocol.DeviceProtos.DeviceRegisterRequest;
+import no.ntnu.eit.skeis.protocol.DeviceProtos.DeviceRegisterRequest.DeviceType;
+import no.ntnu.eit.skeis.protocol.DeviceProtos.DeviceRegisterResponse;
+import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 /**
  * ServerConnection
@@ -50,9 +50,10 @@ public class CentralConnection {
 		out = new BufferedOutputStream(socket.getOutputStream());
 		
 		// Create connection request
-		SensorRegisterRequest request = SensorRegisterRequest.newBuilder()
-				.setClientVersion(Sensor.VERSION)
-				.setClientAlias(client_alias)
+		DeviceRegisterRequest request = DeviceRegisterRequest.newBuilder()
+				.setDeviceVersion(Sensor.VERSION)
+				.setDeviceAlias(client_alias)
+				.setDeviceType(DeviceType.SENSOR)
 				.build();
 		request.writeDelimitedTo(out);
 		out.flush();
@@ -60,13 +61,12 @@ public class CentralConnection {
 		log.info("Register request sent, waiting for central response");
 		
 		// Wait for server to respond
-		SensorRegisterResponse response = SensorRegisterResponse.parseDelimitedFrom(in);
+		DeviceRegisterResponse response = DeviceRegisterResponse.parseDelimitedFrom(in);
 		
-		if(response.getStatus() == SensorRegisterResponse.StatusCodes.OK) {
+		if(response.getStatus() == DeviceRegisterResponse.StatusCodes.OK) {
 			log.info("Central accepted our connection: "+response.getStatusMessage());
 		} else {
 			log.info("Central denied our connection: "+response.getStatusMessage());
-			System.exit(1);
 		}
 	}
 	
@@ -80,7 +80,6 @@ public class CentralConnection {
 	public void sendSensorUpdate(String mac, int rssi) throws IOException {
 		SensorUpdate.newBuilder().setUnitMac(mac).setRssi(rssi).build().writeDelimitedTo(out);
 		out.flush();
-		log.finest("-> Central ("+mac+ " "+rssi+")");
 	}
 	
 }

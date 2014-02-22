@@ -13,9 +13,9 @@ public class Central {
 	public static final long VERSION = 1;
 	private final Logger log;
 	
+	private final DeviceServerSocket deviceServerSocket;
 	private final SensorManager manager;
 	private final DeviceTracker tracker;
-	private final Beacon beacon;
 	
 	public static void main(String[] args) throws Exception {
 		new Central();
@@ -23,24 +23,17 @@ public class Central {
 	
 	public Central() throws Exception {
 		log = Logger.getLogger("Central");
-		manager = new SensorManager(12354);		
-		tracker = new DeviceTracker(manager);		
-		manager.start();
+		manager = new SensorManager();		
+		tracker = new DeviceTracker(manager);
 		
-		beacon = new Beacon(this);
-		beacon.start();
+		deviceServerSocket = new DeviceServerSocket(this);
+		deviceServerSocket.startServer(12354);
 		
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				// Kill beacon thread
-				beacon.stopBeacon();
-				while(true) {
-					try {
-						beacon.join();
-						break;
-					} catch(InterruptedException e) {}					
-				}
+				// Stop device server
+				deviceServerSocket.stopServer();
 				
 				// TODO Sensor manager, 1. stop server socket, 2. notify all sensors
 
