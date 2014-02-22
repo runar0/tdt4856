@@ -70,5 +70,9 @@ public class PlayerManager {
 			listener.onPlayerState(player.getAlias(), update.getState(), update.getUrl(), update.getVolume());
 		}
 	}
+
+	public PlayerConnection getPlayer(String alias) {
+		return players.get(alias);
+	}
 	
 }

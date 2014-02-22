@@ -4,6 +4,9 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
+import javax.sound.midi.ControllerEventListener;
+
+import no.ntnu.eit.skeis.central.devices.PlayerConnection;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 
 /**
@@ -14,17 +17,29 @@ import no.ntnu.eit.skeis.central.devices.SensorManager;
  * 
  * @author Runar B. Olsen <runar.b.olsen@gmail.com>
  */
-public class DeviceTracker implements SensorManager.SensorEventListener {
+public class DeviceTracker implements SensorManager.SensorEventListener, Device.DeviceListener {
 
-	private Map<String, Device> devices;
-	private SensorManager sensors;
+	private final Map<String, Device> devices;
+	private final Central central;
 	
-	public DeviceTracker(SensorManager sensors) {
-		this.sensors = sensors;
+	/**
+	 * Maps room alias to currently controlling device
+	 */
+	private final Map<String, Device> controllingDevice;
+	
+	/**
+	 * Maps device MAC to player being controlled
+	 */
+	private final Map<String, PlayerConnection> controlledPlayer;
+			
+	public DeviceTracker(Central central) {
+		this.central = central;
 		devices = new HashMap<String, Device>();
+		controllingDevice = new HashMap<String, Device>();
+		controlledPlayer = new HashMap<String, PlayerConnection>();
 		
-
-		sensors.addListener(this);
+		central.getSensorManager().addListener(this);
+		
 	}
 
 	@Override
@@ -45,16 +60,15 @@ public class DeviceTracker implements SensorManager.SensorEventListener {
 	@Override
 	public void onSensorUpdate(String alias, String mac, int rssi) {
 		if (!devices.containsKey(mac)) {
-			Device device = new Device(mac, sensors.getSensorAliases());
+			Device device = new Device(mac, central.getSensorManager().getSensorAliases(), this);
 			devices.put(mac, device);
 		}
 		devices.get(mac).onSensorUpdate(alias, rssi);	
-		System.out.println(this);
 	}
 	
 	public String toString() {
 		String out = "Device:\t\t\t";
-		Set<String> aliases = sensors.getSensorAliases();
+		Set<String> aliases = central.getSensorManager().getSensorAliases();
 		
 		for(String sensor : aliases) {
 			out += "| "+sensor+"\t";
@@ -69,6 +83,36 @@ public class DeviceTracker implements SensorManager.SensorEventListener {
 			out += "\n";
 		}
 		return out;
+	}
+
+	// TODO This will only work with one device!
+	@Override
+	public void onDeviceNewClosest(Device device, String sensor_alias) {
+		if (!device.isActive()) {
+			return;
+		}
+		
+		PlayerConnection newPlayer = central.getPlayerManager().getPlayer(sensor_alias);
+		PlayerConnection oldPlayer = controlledPlayer.put(device.getId(), newPlayer);
+		
+		// No change, do nothing
+		if (oldPlayer != null && oldPlayer.equals(newPlayer)) {
+			return;
+		}
+		
+		// Stop old player if it exists
+		if(oldPlayer != null) {
+			oldPlayer.setPlayState(false);
+			
+		}
+		
+		System.out.println(sensor_alias + " is "+newPlayer);
+		
+		if(newPlayer != null) {
+			newPlayer.setUrl(device.getAudioSource().getUrl());
+			newPlayer.setPlayState(true);	
+			newPlayer.setVolume(50);
+		}
 	}
 	
 }

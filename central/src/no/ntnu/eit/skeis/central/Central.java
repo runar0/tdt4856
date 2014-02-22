@@ -30,7 +30,7 @@ public class Central {
 		sensor_manager = new SensorManager();		
 		player_manager = new PlayerManager();
 		
-		tracker = new DeviceTracker(sensor_manager);
+		tracker = new DeviceTracker(this);
 		
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);

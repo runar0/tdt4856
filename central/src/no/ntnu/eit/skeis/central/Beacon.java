@@ -103,7 +103,7 @@ public class Beacon extends Thread {
 								12354
 							)
 						);
-						log.info("Beacon package sent to "+address.getHostAddress());
+						//log.info("Beacon package sent to "+address.getHostAddress());
 					} catch(Exception e) {
 						// Ignore
 					}
