@@ -39,6 +39,7 @@ public class Sensor implements Bluez.ResponseListener {
 				if (args.length == 1) {					
 					Lookout lookout = new Lookout();
 					ConnectionInfo info = lookout.detectCentral();
+					if(info == null) continue;
 					Logger.getGlobal().info("Central detected "+info.toString());
 					
 					address = info.address;

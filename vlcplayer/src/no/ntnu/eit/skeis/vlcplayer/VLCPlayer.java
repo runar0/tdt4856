@@ -31,11 +31,10 @@ public class VLCPlayer implements CentralConnection.CommandListener {
 			System.out.println("Usage: vlcplayer client-alias [central-ip central-port]");
 			System.exit(1);
 		}
-		vlc.start();
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {
-				vlc.stop();
+				vlc.destroy();
 			}
 		});
 		
@@ -48,6 +47,7 @@ public class VLCPlayer implements CentralConnection.CommandListener {
 				if (args.length == 1) {					
 					Lookout lookout = new Lookout();
 					ConnectionInfo info = lookout.detectCentral();
+					if(info == null) continue;
 					Logger.getGlobal().info("Central detected "+info.toString());
 					
 					address = info.address;
