@@ -36,8 +36,7 @@ public class Bluez {
 		while(true) {
 			try {
 				if (p.waitFor() != 0) {
-					// TODO Remove comment below
-					//throw new IOException("Unable to start periodic scan, do you have root?");
+					throw new IOException("Unable to start periodic scan, do you have root?");
 				}
 				break;
 			} catch(InterruptedException e) {
@@ -102,8 +101,7 @@ public class Bluez {
 		while(true) {
 			try {
 				if (p.waitFor() != 0) {
-					// TODO Remove comment below
-					//throw new IOException("Unable to stop periodic scan, do you have root?");
+					throw new IOException("Unable to stop periodic scan, do you have root?");
 				}
 				break;
 			} catch(InterruptedException e) {

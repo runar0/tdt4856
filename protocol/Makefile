@@ -1,7 +1,7 @@
 
 .PHONY: generate
-generate: build sensor.proto
-	protoc -I=. --java_out=build sensor.proto
+generate: build sensor.proto beacon.proto
+	protoc -I=. --java_out=build sensor.proto beacon.proto
 
 build:
 	mkdir build

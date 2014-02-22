@@ -3,6 +3,7 @@ package no.ntnu.eit.skeis.sensor;
 import java.io.BufferedInputStream;
 import java.io.BufferedOutputStream;
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.Socket;
 import java.util.logging.Logger;
 
@@ -27,11 +28,11 @@ public class CentralConnection {
 	private BufferedInputStream in;
 	private BufferedOutputStream out;
 	
-	public CentralConnection(String ip, int port, String client_alias) throws IOException {
+	public CentralConnection(InetAddress address, int port, String client_alias) throws IOException {
 		log = Logger.getLogger("CentralConnection");
 		this.client_alias = client_alias;
 		
-		connect(ip, port);
+		connect(address, port);
 	}
 	
 	/**
@@ -41,10 +42,10 @@ public class CentralConnection {
 	 * @param port
 	 * @throws IOException
 	 */
-	private void connect(String ip, int port) throws IOException {
-		log.info("Attempting to reach central at "+ip+":"+port);
+	private void connect(InetAddress address, int port) throws IOException {
+		log.info("Attempting to reach central at "+address.getHostAddress()+":"+port);
 		
-		socket = new Socket(ip, port);
+		socket = new Socket(address, port);
 		in = new BufferedInputStream(socket.getInputStream());
 		out = new BufferedOutputStream(socket.getOutputStream());
 		

@@ -101,5 +101,9 @@ public class SensorManager extends Thread {
 			listener.onSensorUpdate(source.getAlias(), update.getUnitMac(), update.getRssi());
 		}
 	}
+
+	public int getListenPort() {
+		return port;
+	}
 	
 }

@@ -1,7 +1,10 @@
 package no.ntnu.eit.skeis.sensor;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.util.logging.Logger;
+
+import no.ntnu.eit.skeis.sensor.Lookout.ConnectionInfo;
 
 /**
  * Sensor emulation
@@ -23,14 +26,28 @@ public class Sensor implements Bluez.ResponseListener {
 	public final static long VERSION = 1;
 	
 	public static void main(String[] args) throws Exception {
-		if(args.length != 3) {
-			System.out.println("Usage: sensor central-ip central-port client-alias");
+		if(args.length != 1 && args.length != 3) {
+			System.out.println("Usage: sensor client-alias [central-ip central-port]");
 			System.exit(1);
 		}
-		while(true) {
-			Sensor s;
-			try {
-				s = new Sensor(args[0], Integer.parseInt(args[1]), args[2]);
+		try {
+			while(true) {
+				Sensor s;
+				InetAddress address;
+				int port;
+				String alias = args[0];
+				if (args.length == 1) {					
+					Lookout lookout = new Lookout();
+					ConnectionInfo info = lookout.detectCentral();
+					Logger.getGlobal().info("Central detected "+info.toString());
+					
+					address = info.address;
+					port = info.sensor_port;
+				} else {
+					address = InetAddress.getByName(args[1]);
+					port = Integer.parseInt(args[2]);
+				}
+				s = new Sensor(address, port, alias);
 				
 				while(s.running) {
 					try {
@@ -39,14 +56,11 @@ public class Sensor implements Bluez.ResponseListener {
 						
 					}
 				}
-			} catch(Exception e) {
-				Logger.getGlobal().info("Exception when starting sensor, probably a connection error.");
-				e.printStackTrace();
-				try {
-					Thread.sleep(1000);
-				} catch(Exception ex) {}
+				Logger.getGlobal().info("Sensor exited cleanly, restarting!");				
 			}
-			
+		} catch(Exception e) {
+			Logger.getGlobal().warning("Exception escaped sensor, exitting.");
+			e.printStackTrace();
 		}
 	}
 	
@@ -56,9 +70,10 @@ public class Sensor implements Bluez.ResponseListener {
 	 * 
 	 * @throws Exception
 	 */
-	public Sensor(String ip, int port, String alias) throws Exception {
-		log = Logger.getLogger("Sensor");
-		central = new CentralConnection(ip, port, alias);
+	public Sensor(InetAddress address, int port, String alias) throws Exception {
+		log = Logger.getLogger("Sensor");	
+		
+		central = new CentralConnection(address, port, alias);
 		running = true;
 		Bluez.startScan(this);
 	}
