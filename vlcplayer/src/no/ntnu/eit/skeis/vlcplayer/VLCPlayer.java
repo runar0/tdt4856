@@ -16,8 +16,6 @@ public class VLCPlayer implements CentralConnection.CommandListener {
 
 	final Logger log;
 	
-	public volatile boolean running;
-	
 	private final static VLC vlc = new VLC();
 	
 	/**
@@ -60,13 +58,6 @@ public class VLCPlayer implements CentralConnection.CommandListener {
 				}
 				player = new VLCPlayer(address, port, alias);
 				
-				while(player.running) {
-					try {
-						Thread.sleep(1000);
-					} catch(Exception e) {
-						
-					}
-				}
 				Logger.getGlobal().info("Player exited cleanly, restarting!");				
 			}
 		} catch(Exception e) {
@@ -86,7 +77,13 @@ public class VLCPlayer implements CentralConnection.CommandListener {
 		
 		central = new CentralConnection(alias, this);
 		central.connect(address, port);
-		running = true;
+		
+		while(true) {
+			try {
+				central.join();
+				break;
+			} catch(InterruptedException e) {}
+		}
 	}
 
 	@Override
