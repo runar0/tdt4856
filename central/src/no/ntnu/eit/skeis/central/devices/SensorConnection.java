@@ -1,4 +1,4 @@
-package no.ntnu.eit.skeis.central;
+package no.ntnu.eit.skeis.central.devices;
 
 import java.io.IOException;
 import java.io.InputStream;

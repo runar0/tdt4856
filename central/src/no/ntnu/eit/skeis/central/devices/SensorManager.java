@@ -1,4 +1,4 @@
-package no.ntnu.eit.skeis.central;
+package no.ntnu.eit.skeis.central.devices;
 
 import java.util.HashMap;
 import java.util.HashSet;
@@ -10,7 +10,7 @@ import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 public class SensorManager {
 
-	interface SensorEventListener {
+	public interface SensorEventListener {
 		public void onSensorAttach(String alias);
 		public void onSensorDetach(String alias);
 		public void onSensorUpdate(String alias, String mac, int rssi);

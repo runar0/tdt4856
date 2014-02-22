@@ -9,6 +9,8 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.devices.PlayerConnection;
+import no.ntnu.eit.skeis.central.devices.SensorConnection;
 import no.ntnu.eit.skeis.protocol.DeviceProtos.DeviceRegisterRequest;
 import no.ntnu.eit.skeis.protocol.DeviceProtos.DeviceRegisterResponse;
 
@@ -110,7 +112,15 @@ public class DeviceServerSocket extends Thread {
 					// Hand device to the correct manager
 					switch(request.getDeviceType()) {
 					case PLAYER:
-						
+						central.getPlayerManager().addPlayer(
+							request.getDeviceAlias(),
+							new PlayerConnection(
+								central.getPlayerManager(), 
+								request.getDeviceAlias(),
+								in, 
+								out
+							)
+						);
 						break;
 					case SENSOR:
 						central.getSensorManager().addSensor(

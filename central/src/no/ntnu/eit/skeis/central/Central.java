@@ -8,13 +8,17 @@ package no.ntnu.eit.skeis.central;
 
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.devices.PlayerManager;
+import no.ntnu.eit.skeis.central.devices.SensorManager;
+
 public class Central {
 
 	public static final long VERSION = 1;
 	private final Logger log;
 	
 	private final DeviceServerSocket deviceServerSocket;
-	private final SensorManager manager;
+	private final SensorManager sensor_manager;
+	private final PlayerManager player_manager;
 	private final DeviceTracker tracker;
 	
 	public static void main(String[] args) throws Exception {
@@ -23,8 +27,10 @@ public class Central {
 	
 	public Central() throws Exception {
 		log = Logger.getLogger("Central");
-		manager = new SensorManager();		
-		tracker = new DeviceTracker(manager);
+		sensor_manager = new SensorManager();		
+		player_manager = new PlayerManager();
+		
+		tracker = new DeviceTracker(sensor_manager);
 		
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);
@@ -36,6 +42,7 @@ public class Central {
 				deviceServerSocket.stopServer();
 				
 				// TODO Sensor manager, 1. stop server socket, 2. notify all sensors
+				// TODO player manager --"--
 
 				log.info("Stopping");
 			}
@@ -47,6 +54,10 @@ public class Central {
 	}
 	
 	public SensorManager getSensorManager() {
-		return manager;
+		return sensor_manager;
+	}
+	
+	public PlayerManager getPlayerManager() {
+		return player_manager;
 	}
 }
