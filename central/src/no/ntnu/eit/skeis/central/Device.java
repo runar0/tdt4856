@@ -51,12 +51,14 @@ public class Device {
 		}
 		
 		// TODO This is just for testing
-		audio_source = new AudioSource() {
-			@Override
-			public String getUrl() {
-				return "http://lyd.nrk.no/nrk_radio_p1_sogn_og_fjordane_mp3_h.m3u";
-			}
-		};
+		if(mac.toLowerCase().startsWith("a8:26:d9")) {
+			audio_source = new AudioSource() {
+				@Override
+				public String getUrl() {
+					return "http://lyd.nrk.no/nrk_radio_p1_sogn_og_fjordane_mp3_h.m3u";
+				}
+			};
+		}
 	}
 	
 	public String getId() {
