@@ -23,16 +23,38 @@ public class Device {
 		 * @param sensor_alias
 		 */
 		public void onDeviceNewClosest(Device device, String sensor_alias);
+		
+		/**
+		 * Called when the active status of a player changes
+		 */
+		public void onActiveStatusChange(Device device, String sensor_alias);
 	}
 	
 	private static final int INFINITY = -90;
 	
+	/**
+	 * PlayerConnection this device is related to
+	 */
+	private PlayerConnection player;
+	
+	/**
+	 * Store readings for each of the sensors
+	 */
 	private Map<String, Integer> readings;
 	
+	/**
+	 * Device id
+	 */
 	private String mac;
 	
+	/**
+	 * Listener to be notified on device events
+	 */
 	private DeviceListener listener;
 	
+	/**
+	 * Alias of the current closest sensor, used to detect if we got a new closest one
+	 */
 	private String closest_sensor = null;
 	
 	/**
@@ -105,6 +127,9 @@ public class Device {
 		return readings.get(alias);
 	}
 	
+	/**
+	 * Update closest sensor, and notify the device listener if it has changed
+	 */
 	private void updateClosestSensor() {
 		int min = INFINITY;
 		String alias = "";
@@ -118,6 +143,15 @@ public class Device {
 			closest_sensor = alias;
 			listener.onDeviceNewClosest(this, alias);
 		}
+	}
+	
+	/**
+	 * Get the alias of the currently closest sensor
+	 * 
+	 * @return
+	 */
+	public String getClosestSensor() {
+		return closest_sensor;
 	}
 
 	/**
@@ -135,4 +169,21 @@ public class Device {
 		return audio_source;
 	}
 	
+	/**
+	 * Set the player connection this device is associated with
+	 * 
+	 * @param player
+	 */
+	public void setPlayerConnection(PlayerConnection player) {
+		this.player = player;
+	}
+	
+	/**
+	 * Get associated player connection
+	 * 
+	 * @return
+	 */
+	public PlayerConnection getPlayerConnection() {
+		return player;
+	}
 }

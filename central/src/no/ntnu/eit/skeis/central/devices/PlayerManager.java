@@ -6,8 +6,9 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.Central;
+import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.protocol.device.PlayerProtos.PlayerStateUpdate;
-import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 public class PlayerManager {
 
@@ -22,7 +23,10 @@ public class PlayerManager {
 	
 	private Set<PlayerEventListener> listeners;
 	
-	public PlayerManager() {
+	private Central central;
+	
+	public PlayerManager(Central central) {
+		this.central = central;
 		listeners = new HashSet<PlayerEventListener>();
 		players = new HashMap<String, PlayerConnection>();
 		log = Logger.getLogger(getClass().getName());
@@ -54,6 +58,11 @@ public class PlayerManager {
 		for (PlayerEventListener listener : listeners) {
 			listener.onPlayerAttach(alias);
 		}
+		
+		// Associate any devices that are already closest to the matching sensor
+		for(Device device : central.getDeviceTracker().getDevicesClosestTo(alias)) {
+			player.registerDevice(device);
+		}
 		return true;
 	}
 	
@@ -73,6 +82,38 @@ public class PlayerManager {
 
 	public PlayerConnection getPlayer(String alias) {
 		return players.get(alias);
+	}
+	
+	/**
+	 * Called by the DeviceTracker when a device has a new closest sensor, if a player with the same
+	 * alias as the new closest sensor exists we will register the device with that player. At the same
+	 * time any previous registration has to be invalidated.
+	 * 
+	 * @param alias
+	 * @param device
+	 */
+	public void updateDevicePosition(String alias, Device device) {
+		if(device.getPlayerConnection() != null && device.getPlayerConnection().getAlias().equals(alias)) {
+			return;
+		}		
+		removeDevice(device);
+		
+		PlayerConnection newPlayer = players.get(alias);
+		if(newPlayer != null) {
+			newPlayer.registerDevice(device);
+		}
+	}
+	
+	/**
+	 * Called by the DeviceTracker when a device is to be removed, this can be caused by a device
+	 * timing out (not being detected for a set amount of time) or stopping playback.
+	 * 
+	 * @param device
+	 */
+	public void removeDevice(Device device) {
+		if(device.getPlayerConnection() != null) {
+			device.getPlayerConnection().unregisterDevice(device);
+		}
 	}
 	
 }

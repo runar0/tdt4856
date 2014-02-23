@@ -26,12 +26,11 @@ public class Central {
 	}
 	
 	public Central() throws Exception {
-		log = Logger.getLogger("Central");
+		log = Logger.getLogger(getClass().getName());
+		
 		sensor_manager = new SensorManager();		
-		player_manager = new PlayerManager();
-		
-		tracker = new DeviceTracker(this);
-		
+		player_manager = new PlayerManager(this);		
+		tracker = new DeviceTracker(this);		
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);
 		

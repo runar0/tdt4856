@@ -1,12 +1,11 @@
 package no.ntnu.eit.skeis.central;
 
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import javax.sound.midi.ControllerEventListener;
-
-import no.ntnu.eit.skeis.central.devices.PlayerConnection;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 
 /**
@@ -22,21 +21,10 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	private final Map<String, Device> devices;
 	private final Central central;
 	
-	/**
-	 * Maps room alias to currently controlling device
-	 */
-	private final Map<String, Device> controllingDevice;
-	
-	/**
-	 * Maps device MAC to player being controlled
-	 */
-	private final Map<String, PlayerConnection> controlledPlayer;
 			
 	public DeviceTracker(Central central) {
 		this.central = central;
 		devices = new HashMap<String, Device>();
-		controllingDevice = new HashMap<String, Device>();
-		controlledPlayer = new HashMap<String, PlayerConnection>();
 		
 		central.getSensorManager().addListener(this);
 		
@@ -85,34 +73,45 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 		return out;
 	}
 
-	// TODO This will only work with one device!
+	/**
+	 * Called by a device when it has detected that it has a new closest sensor
+	 */
 	@Override
 	public void onDeviceNewClosest(Device device, String sensor_alias) {
 		if (!device.isActive()) {
 			return;
 		}
-		
-		PlayerConnection newPlayer = central.getPlayerManager().getPlayer(sensor_alias);
-		PlayerConnection oldPlayer = controlledPlayer.put(device.getId(), newPlayer);
-		
-		// No change, do nothing
-		if (oldPlayer != null && oldPlayer.equals(newPlayer)) {
-			return;
+		// Let the player manager know about the new device position
+		central.getPlayerManager().updateDevicePosition(sensor_alias, device);
+	}
+
+	/**
+	 * Called by a device when its active status has changed
+	 */
+	@Override
+	public void onActiveStatusChange(Device device, String sensor_alias) {
+		if(device.isActive()) {
+			onDeviceNewClosest(device, sensor_alias); 
+		} else {
+			central.getPlayerManager().removeDevice(device);
 		}
 		
-		// Stop old player if it exists
-		if(oldPlayer != null) {
-			oldPlayer.setPlayState(false);
-			
+	}
+
+	/**
+	 * Get all devices closest to the sensor given by alias
+	 * 
+	 * @param alias
+	 * @return
+	 */
+	public List<Device> getDevicesClosestTo(String alias) {
+		List<Device> devices = new LinkedList<Device>();
+		for(Device device : this.devices.values()) {
+			if(device.getClosestSensor().equals(alias)) {
+				devices.add(device);
+			}
 		}
-		
-		System.out.println(sensor_alias + " is "+newPlayer);
-		
-		if(newPlayer != null) {
-			newPlayer.setUrl(device.getAudioSource().getUrl());
-			newPlayer.setPlayState(true);	
-			newPlayer.setVolume(50);
-		}
+		return devices;
 	}
 	
 }
