@@ -1,11 +1,5 @@
 package no.ntnu.eit.skeis.central;
 
-
-// SEnsor manager -> flytt socket dit, listener events
-// DEvice tracker -> lytter på sensor updates, har en device per observerte device
-// DEvice lytter på sensor attaches/detachers oppdaterer intern state
-
-
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
