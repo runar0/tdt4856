@@ -12,7 +12,7 @@
     <property name="source" value="1.7"/>
     <path id="sensor.classpath">
         <pathelement location="bin"/>
-        <pathelement location="../protocol/lib/protobuf-java-2.5.0.jar"/>
+        <pathelement location="../lib/protobuf-java-2.5.0.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>
@@ -69,7 +69,7 @@
                 <attribute name="Class-Path" value="."/>
             </manifest>
             <fileset dir="bin"/>
-            <zipfileset excludes="META-INF/*.SF" src="../protocol/lib/protobuf-java-2.5.0.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../lib/protobuf-java-2.5.0.jar"/>
         </jar>
     </target>
 </project>

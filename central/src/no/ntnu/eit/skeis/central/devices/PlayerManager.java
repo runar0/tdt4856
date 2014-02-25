@@ -18,7 +18,7 @@ public class PlayerManager {
 		public void onPlayerState(String alias, PlayerStateUpdate.States state, String url, int volume);
 	}
 	
-	private Map<String, PlayerConnection> players;
+	private Map<String, PlayerInterface> players;
 	private Logger log;
 	
 	private Set<PlayerEventListener> listeners;
@@ -28,7 +28,7 @@ public class PlayerManager {
 	public PlayerManager(Central central) {
 		this.central = central;
 		listeners = new HashSet<PlayerEventListener>();
-		players = new HashMap<String, PlayerConnection>();
+		players = new HashMap<String, PlayerInterface>();
 		log = Logger.getLogger(getClass().getName());
 	}
 		
@@ -49,7 +49,7 @@ public class PlayerManager {
 		listeners.remove(listener);
 	}
 	
-	public boolean addPlayer(String alias, final PlayerConnection player) {
+	public boolean addPlayer(String alias, final PlayerInterface player) {
 		if (players.containsKey(alias)) {
 			return false;
 		}
@@ -66,21 +66,23 @@ public class PlayerManager {
 		return true;
 	}
 	
-	public void removeSensor(String alias) {
+	public void removePlayer(String alias) {
 		log.info("Removing player "+alias);
-		players.remove(alias);
-		for (PlayerEventListener listener : listeners) {
-			listener.onPlayerDetach(alias);
+		PlayerInterface player = players.remove(alias);
+		if (player != null) {
+			for (PlayerEventListener listener : listeners) {
+				listener.onPlayerDetach(alias);
+			}
 		}
 	}
 	
-	public void onStateUpdate(PlayerConnection player, PlayerStateUpdate update) {
+	public void onStateUpdate(PlayerInterface player, PlayerStateUpdate update) {
 		for (PlayerEventListener listener : listeners) {
 			listener.onPlayerState(player.getAlias(), update.getState(), update.getUrl(), update.getVolume());
 		}
 	}
 
-	public PlayerConnection getPlayer(String alias) {
+	public PlayerInterface getPlayer(String alias) {
 		return players.get(alias);
 	}
 	
@@ -98,7 +100,7 @@ public class PlayerManager {
 		}		
 		removeDevice(device);
 		
-		PlayerConnection newPlayer = players.get(alias);
+		PlayerInterface newPlayer = players.get(alias);
 		if(newPlayer != null) {
 			newPlayer.registerDevice(device);
 		}

@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
-import no.ntnu.eit.skeis.central.devices.PlayerConnection;
+import no.ntnu.eit.skeis.central.devices.PlayerInterface;
 
 /**
  * Device
@@ -35,7 +35,7 @@ public class Device {
 	/**
 	 * PlayerConnection this device is related to
 	 */
-	private PlayerConnection player;
+	private PlayerInterface player;
 	
 	/**
 	 * Store readings for each of the sensors
@@ -174,7 +174,7 @@ public class Device {
 	 * 
 	 * @param player
 	 */
-	public void setPlayerConnection(PlayerConnection player) {
+	public void setPlayerConnection(PlayerInterface player) {
 		this.player = player;
 	}
 	
@@ -183,7 +183,7 @@ public class Device {
 	 * 
 	 * @return
 	 */
-	public PlayerConnection getPlayerConnection() {
+	public PlayerInterface getPlayerConnection() {
 		return player;
 	}
 }

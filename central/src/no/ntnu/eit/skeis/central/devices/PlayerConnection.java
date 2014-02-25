@@ -3,7 +3,6 @@ package no.ntnu.eit.skeis.central.devices;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Deque;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
@@ -19,41 +18,19 @@ import no.ntnu.eit.skeis.protocol.device.PlayerProtos.PlayerStateUpdate;
  * 
  * @author Runar B. Olsen <runar.b.olsen@gmail.com>
  */
-public class PlayerConnection {
+public class PlayerConnection extends AbstractPlayer {
 
-	private final Logger log;
-	private final PlayerManager manager;
-	
 	private InputStream in;
 	private OutputStream out;
 	
-	private String alias;
-	
 	private Thread readThread;
 	
-	/**
-	 * Queue of all active devices that are currently registered as closest to this player
-	 */
-	private Deque<Device> devices;
-	
-	/**
-	 * The device that is currently controlling this player
-	 */
-	private Device active_device;
-	
-	
 	public PlayerConnection(PlayerManager manager, String alias, InputStream in, OutputStream out) {
-		log = Logger.getLogger(getClass().getName());
-		this.alias = alias;
+		super(manager, alias);
+		
 		this.in = in;
 		this.out = out;
-		this.manager = manager;
-		devices = new LinkedList<Device>();
 		startReadLoop();
-	}
-	
-	public String getAlias() {
-		return alias;
 	}
 	
 	/**
@@ -61,7 +38,7 @@ public class PlayerConnection {
 	 * 
 	 */
 	private void startReadLoop() {
-		final PlayerConnection player = this;
+		final PlayerInterface player = this;
 		readThread = new Thread() {
 			@Override
 			public void run() {
@@ -77,7 +54,7 @@ public class PlayerConnection {
 					} catch(IOException ioe) {
 						log.info("Excpetion in read loop, dropping player");
 						log.warning(ioe.toString());
-						manager.removeSensor(alias);
+						manager.removePlayer(alias);
 						return;
 					}
 				}
@@ -86,6 +63,11 @@ public class PlayerConnection {
 		readThread.start();
 	}
 	
+	/**
+	 * Send a command 
+	 * 
+	 * @param command
+	 */
 	private void sendCommand(PlayerCommand command) {
 		try {
 			command.writeDelimitedTo(out);
@@ -93,6 +75,10 @@ public class PlayerConnection {
 		} catch(IOException e) {}
 	}
 	
+	/* (non-Javadoc)
+	 * @see no.ntnu.eit.skeis.central.devices.PlayerInterface#setUrl(java.lang.String)
+	 */
+	@Override
 	public void setUrl(String url) {
 		sendCommand(PlayerCommand.newBuilder()
 			.setCommand(Commands.SET_URL)
@@ -101,6 +87,10 @@ public class PlayerConnection {
 		);
 	}
 	
+	/* (non-Javadoc)
+	 * @see no.ntnu.eit.skeis.central.devices.PlayerInterface#setPlayState(boolean)
+	 */
+	@Override
 	public void setPlayState(boolean play) {
 		sendCommand(PlayerCommand.newBuilder()
 			.setCommand((play ? Commands.PLAY : Commands.STOP))
@@ -108,6 +98,10 @@ public class PlayerConnection {
 		);
 	}
 	
+	/* (non-Javadoc)
+	 * @see no.ntnu.eit.skeis.central.devices.PlayerInterface#setVolume(int)
+	 */
+	@Override
 	public void setVolume(int volume) {
 		sendCommand(PlayerCommand.newBuilder()
 			.setCommand(Commands.SET_VOLUME)
@@ -115,49 +109,6 @@ public class PlayerConnection {
 			.build()
 		);
 		
-	}
-	
-	/**
-	 * Called after a device has been added or removed to the control queue at this player
-	 */
-	private void updateActivePlayer() {	
-		System.out.println("Player "+alias+": "+devices);
-		// TODO Priority can be implemented here, the best way would be to replace the LL with a PQ
-		Device d = devices.peekFirst();
-		if (d == null) {
-			setPlayState(false);
-		} else if(!d.equals(active_device)) {
-			setUrl(d.getAudioSource().getUrl());
-			setPlayState(true);
-			setVolume(50);
-			active_device = d;
-		}
-	}
-
-	/**
-	 * Register a new device to this player
-	 * 
-	 * @param device
-	 */
-	public void registerDevice(Device device) {
-		if(!devices.contains(device)) {
-			devices.addLast(device);
-			device.setPlayerConnection(this);
-		}
-		updateActivePlayer();
-	}
-
-	/**
-	 * Unregister a previously registered device
-	 * 
-	 * @param device
-	 */
-	public void unregisterDevice(Device device) {
-		if(devices.contains(device)) {
-			devices.remove(device);
-			device.setPlayerConnection(null);
-		}
-		updateActivePlayer();
 	}
 	
 }
