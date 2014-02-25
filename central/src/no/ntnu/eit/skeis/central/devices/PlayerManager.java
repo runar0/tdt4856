@@ -9,14 +9,12 @@ import java.util.logging.Logger;
 import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
-import no.ntnu.eit.skeis.protocol.device.PlayerProtos.PlayerStateUpdate;
 
 public class PlayerManager {
 
 	public interface PlayerEventListener {
 		public void onPlayerAttach(String alias);
 		public void onPlayerDetach(String alias);
-		public void onPlayerState(String alias, PlayerStateUpdate.States state, String url, int volume);
 	}
 	
 	private Map<String, PlayerInterface> players;
@@ -74,12 +72,6 @@ public class PlayerManager {
 			for (PlayerEventListener listener : listeners) {
 				listener.onPlayerDetach(alias);
 			}
-		}
-	}
-	
-	public void onStateUpdate(PlayerInterface player, PlayerStateUpdate update) {
-		for (PlayerEventListener listener : listeners) {
-			listener.onPlayerState(player.getAlias(), update.getState(), update.getUrl(), update.getVolume());
 		}
 	}
 
