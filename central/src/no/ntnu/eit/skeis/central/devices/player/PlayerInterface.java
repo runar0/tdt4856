@@ -1,4 +1,4 @@
-package no.ntnu.eit.skeis.central.devices;
+package no.ntnu.eit.skeis.central.devices.player;
 
 import no.ntnu.eit.skeis.central.Device;
 

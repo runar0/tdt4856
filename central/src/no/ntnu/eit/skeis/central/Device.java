@@ -5,7 +5,7 @@ import java.util.Map;
 import java.util.Set;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
-import no.ntnu.eit.skeis.central.devices.PlayerInterface;
+import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
 
 /**
  * Device

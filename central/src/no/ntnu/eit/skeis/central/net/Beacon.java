@@ -1,4 +1,4 @@
-package no.ntnu.eit.skeis.central;
+package no.ntnu.eit.skeis.central.net;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -14,6 +14,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.protocol.BeaconProtos.CentralBeacon;
 
 /**

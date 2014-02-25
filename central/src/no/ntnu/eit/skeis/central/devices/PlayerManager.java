@@ -8,6 +8,7 @@ import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Device;
+import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
 import no.ntnu.eit.skeis.protocol.device.PlayerProtos.PlayerStateUpdate;
 
 public class PlayerManager {

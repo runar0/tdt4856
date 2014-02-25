@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.devices.sensor.SensorConnection;
 import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 public class SensorManager {

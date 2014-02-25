@@ -1,6 +1,8 @@
-package no.ntnu.eit.skeis.central.devices;
+package no.ntnu.eit.skeis.central.devices.player;
 
 import java.util.logging.Logger;
+
+import no.ntnu.eit.skeis.central.devices.PlayerManager;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.controlpoint.ActionCallback;

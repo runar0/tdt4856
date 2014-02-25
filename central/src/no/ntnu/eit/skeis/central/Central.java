@@ -3,8 +3,9 @@ package no.ntnu.eit.skeis.central;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
-import no.ntnu.eit.skeis.central.devices.PlayerUPNPScanner;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
+import no.ntnu.eit.skeis.central.net.DeviceServerSocket;
+import no.ntnu.eit.skeis.central.net.UPNPDeviceServer;
 
 public class Central {
 
@@ -23,15 +24,15 @@ public class Central {
 	public Central() throws Exception {
 		log = Logger.getLogger(getClass().getName());
 		
-		UPNPDeviceServer upnpDeviceServer = new UPNPDeviceServer(this);
-		upnpDeviceServer.start();
-		
-		
 		sensor_manager = new SensorManager();		
 		player_manager = new PlayerManager(this);		
 		tracker = new DeviceTracker(this);		
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);
+		
+		// Start UPNP control point
+		UPNPDeviceServer upnpDeviceServer = new UPNPDeviceServer(this);
+		upnpDeviceServer.start();
 		
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override

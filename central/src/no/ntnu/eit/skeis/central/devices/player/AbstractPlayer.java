@@ -1,10 +1,11 @@
-package no.ntnu.eit.skeis.central.devices;
+package no.ntnu.eit.skeis.central.devices.player;
 
 import java.util.Deque;
 import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.Device;
+import no.ntnu.eit.skeis.central.devices.PlayerManager;
 
 abstract public class AbstractPlayer implements PlayerInterface {
 

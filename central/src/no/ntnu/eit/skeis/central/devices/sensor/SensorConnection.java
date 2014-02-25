@@ -1,11 +1,11 @@
-package no.ntnu.eit.skeis.central.devices;
+package no.ntnu.eit.skeis.central.devices.sensor;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.net.Socket;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.devices.SensorManager;
 import no.ntnu.eit.skeis.protocol.device.SensorProtos.SensorUpdate;
 
 /**
@@ -21,8 +21,6 @@ public class SensorConnection {
 	private final SensorManager manager;
 	
 	private InputStream in;
-	private OutputStream out;
-	
 	private String alias;
 	
 	private Thread readThread;
@@ -32,7 +30,6 @@ public class SensorConnection {
 		log = Logger.getLogger(getClass().getName());
 		this.alias = alias;
 		this.in = in;
-		this.out = out;
 		this.manager = manager;
 		startReadLoop();
 	}

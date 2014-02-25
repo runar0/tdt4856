@@ -1,9 +1,10 @@
-package no.ntnu.eit.skeis.central;
+package no.ntnu.eit.skeis.central.net;
 
 import java.util.HashMap;
 import java.util.Map;
 
-import no.ntnu.eit.skeis.central.devices.PlayerUPNP;
+import no.ntnu.eit.skeis.central.Central;
+import no.ntnu.eit.skeis.central.devices.player.PlayerUPNP;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceImpl;
@@ -37,6 +38,7 @@ public class UPNPDeviceServer extends Thread {
 		aliases = new HashMap<String, String>();
 		// XBMC runar-archy
 		aliases.put("3cdbb3d4-8c1a-d6f0-494f-93fa97d93337", "runar");
+		aliases.put("09527f1f-ab89-bf64-0000-000005ff505c", "runar");
 	}
 
 	private static String getUUIDAlias(String uuid) {
