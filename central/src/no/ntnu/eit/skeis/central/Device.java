@@ -48,6 +48,11 @@ public class Device {
 	private String mac;
 	
 	/**
+	 * Time stamp of last update received by Device
+	 */
+	private long last_update;
+	
+	/**
 	 * Listener to be notified on device events
 	 */
 	private DeviceListener listener;
@@ -62,12 +67,20 @@ public class Device {
 	 */
 	private AudioSource audio_source;
 	
-	
+	/**
+	 * Construct a new device
+	 * 
+	 * @param mac
+	 * @param sensorAliases
+	 * @param listener
+	 */
 	public Device(String mac, Set<String> sensorAliases, DeviceListener listener) {
 		this.mac = mac;
 		this.listener = listener;
 		readings = new HashMap<String, Integer>();
+		last_update = System.currentTimeMillis();
 		
+		// Emulate a attach event for all already attached sensors
 		for(String s : sensorAliases) {
 			onSensorAttach(s);
 		}
@@ -83,8 +96,22 @@ public class Device {
 		}
 	}
 	
+	/**
+	 * Get device id (bluetooth mac)
+	 * 
+	 * @return
+	 */
 	public String getId() {
 		return mac;
+	}
+	
+	/**
+	 * Time stamp of last update
+	 * 
+	 * @return
+	 */
+	public long getLastUpdate() {
+		return last_update;
 	}
 
 	/**
@@ -112,6 +139,7 @@ public class Device {
 	 * @param rssi
 	 */
 	public void onSensorUpdate(String alias, int rssi) {
+		last_update = System.currentTimeMillis();
 		readings.put(alias, rssi);
 		updateClosestSensor();
 	}
@@ -185,5 +213,9 @@ public class Device {
 	 */
 	public PlayerInterface getPlayerConnection() {
 		return player;
+	}
+	
+	public String toString() {
+		return mac;
 	}
 }

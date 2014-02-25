@@ -7,6 +7,14 @@ import java.util.logging.Logger;
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 
+/**
+ * Abstract Player
+ * 
+ * This implementation contains all code related to device control handling, this is 
+ * common to all Players no matter how the player itself is controlled
+ * 
+ * @author Runar B. Olsen <runar.b.olsen@gmail.com>
+ */
 abstract public class AbstractPlayer implements PlayerInterface {
 
 	protected final Logger log;
@@ -66,9 +74,11 @@ abstract public class AbstractPlayer implements PlayerInterface {
 	 * the controlling device
 	 */
 	private void updateActivePlayer() {	
-		System.out.println("Player "+alias+": "+devices);
+		log.info("Player "+alias+": Device queue "+devices);
 		
 		// TODO Priority can be implemented here, the best way would be to replace the LL with a PQ
+		// TODO deivce.getLastUpdate() is the timestamp of the last update, might be an idea to time out devices after a set amount of time
+		
 		Device d = devices.peekFirst();
 		if (d == null) {
 			setPlayState(false);
@@ -79,5 +89,4 @@ abstract public class AbstractPlayer implements PlayerInterface {
 			active_device = d;
 		}
 	}
-
 }
