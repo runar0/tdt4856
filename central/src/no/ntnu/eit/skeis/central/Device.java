@@ -90,7 +90,7 @@ public class Device {
 			audio_source = new AudioSource() {
 				@Override
 				public String getUrl() {
-					return "http://lyd.nrk.no/nrk_radio_p1_sogn_og_fjordane_mp3_h.m3u";
+					return "x-rincon-mp3radio://192.168.0.1:8080/test";
 				}
 			};
 		}
