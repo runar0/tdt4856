@@ -52,6 +52,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 			devices.put(mac, device);
 		}
 		devices.get(mac).onSensorUpdate(alias, rssi);	
+		System.out.println(this);
 	}
 	
 	public String toString() {

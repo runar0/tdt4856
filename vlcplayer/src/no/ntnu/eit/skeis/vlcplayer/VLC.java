@@ -91,6 +91,7 @@ public class VLC {
 	public void start() {
 		log.info("Starting playback of "+url);
 		try {
+			setVolume(50);
 			sendRequest("command=in_play&input="+url);
 		} catch(IOException ioe) {
 			ioe.printStackTrace();

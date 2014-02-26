@@ -2,6 +2,7 @@ package no.ntnu.eit.skeis.central.devices.player;
 
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import de.kalass.sonoscontrol.api.control.SonosDevice;
 import de.kalass.sonoscontrol.api.core.Callback0;
@@ -23,6 +24,7 @@ public class PlayerSonos extends AbstractPlayer {
 	
 	@Override
 	public void setUrl(String url) {
+		log.info("PlayerSONOS set url: "+url);
 		this.url = url;
 	}
 
@@ -33,37 +35,25 @@ public class PlayerSonos extends AbstractPlayer {
 			transport.setAVTransportURI(AVTransportURI.getInstance(this.url), null, new Callback0() {
                 @Override
                 public void success() {
-                	System.out.println("Set url");
-                	transport.play(new Callback0() {
-                		@Override
-                		public void success() {
-                			System.out.println("Started playing");
-                			
-                		}
-                		
-                	});
+                	transport.play(null);
                 }
             });
 			
 		} else {
-			transport.stop(new Callback0() {
-				public void success() {
-                	System.out.println("Stopped playback");
-                	transport.removeAllTracksFromQueue(new Callback0() {
-                		@Override
-                		public void success() {
-                			System.out.println("Cleared queue?");
-                		}
-                	});
-                }
-			});
+			transport.stop(null);
 		}
 	}
 
 	@Override
 	public void setVolume(int volume) {
-		// TODO Auto-generated method stub
+		log.info("SET VOLUME NOT IMPLEMETED FOR SONOS PLAYERS");
 
+	}
+
+	@Override
+	protected void playAudioSource(AudioSource source) {
+		setUrl(source.getSonosUrl());
+		setPlayState(true);
 	}
 
 }

@@ -9,10 +9,16 @@ package no.ntnu.eit.skeis.central.audio;
 public interface AudioSource {
 
 	/**
-	 * URL endpoint where a player object can reach this audio stream
+	 * Http url endpoint where the stream is at
 	 * 
 	 * @return
 	 */
-	public String getUrl();
+	public String getHttpUrl();
+	
+	/**
+	 * Url to the same stream, but formatted for sonos devices
+	 * @return
+	 */
+	public String getSonosUrl();
 	
 }

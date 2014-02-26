@@ -18,7 +18,7 @@
 		<link>
 			<name>protocol</name>
 			<type>2</type>
-			<location>/home/runar/Desktop/tdt4856/protocol/build</location>
+			<locationURI>WORKSPACE_LOC/protocol/build</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>

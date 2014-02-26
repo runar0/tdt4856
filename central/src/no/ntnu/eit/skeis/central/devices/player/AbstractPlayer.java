@@ -5,6 +5,7 @@ import java.util.LinkedList;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.Device;
+import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 
 /**
@@ -50,6 +51,7 @@ abstract public class AbstractPlayer implements PlayerInterface {
 	 */
 	@Override
 	public void registerDevice(Device device) {
+		log.info("Player "+alias+": Register device "+device);
 		if(!devices.contains(device)) {
 			devices.addLast(device);
 			device.setPlayerConnection(this);
@@ -62,6 +64,7 @@ abstract public class AbstractPlayer implements PlayerInterface {
 	 */
 	@Override
 	public void unregisterDevice(Device device) {
+		log.info("Player "+alias+": Unregister device "+device);
 		if(devices.contains(device)) {
 			devices.remove(device);
 			device.setPlayerConnection(null);
@@ -87,10 +90,10 @@ abstract public class AbstractPlayer implements PlayerInterface {
 		if (d == null) {
 			setPlayState(false);
 		} else if(!d.equals(active_device)) {
-			setUrl(d.getAudioSource().getUrl());
-			setPlayState(true);
-			setVolume(50);
+			playAudioSource(d.getAudioSource());
 			active_device = d;
 		}
 	}
+	
+	protected abstract void playAudioSource(AudioSource source);
 }
