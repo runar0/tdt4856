@@ -52,6 +52,8 @@ public class UPNPDeviceServer extends Thread {
 	private final Central central;
 	private boolean running;
 	
+	private final UpnpService upnp;
+	
 	/**
 	 * Service ID for playback devices
 	 */
@@ -59,6 +61,7 @@ public class UPNPDeviceServer extends Thread {
 	
 	public UPNPDeviceServer(Central central) {
 		this.central = central;
+		upnp = new UpnpServiceImpl();
 	}
 	
 	/**
@@ -67,7 +70,6 @@ public class UPNPDeviceServer extends Thread {
 	@Override
 	public void run() {
 		running = true;
-		final UpnpService upnp = new UpnpServiceImpl(); 
 		
 		// Add listener for device add and removed
 		upnp.getRegistry().addListener(new DefaultRegistryListener() {
@@ -87,7 +89,7 @@ public class UPNPDeviceServer extends Thread {
 			public void remoteDeviceRemoved(Registry registry, RemoteDevice device) {
 				String alias = getUUIDAlias(device.getIdentity().getUdn().getIdentifierString());
 				RemoteService service = device.findService(serviceId);
-				if(service != null) {
+				if(service != null || alias.startsWith("RINCON_")) {
 					central.getPlayerManager().removePlayer(alias);
 				}
 			}
@@ -117,6 +119,10 @@ public class UPNPDeviceServer extends Thread {
 	 */
 	public void stopDeviceServer() {
 		running = false;
+	}
+
+	public UpnpService getUpnpService() {
+		return upnp;
 	}
 	
 }

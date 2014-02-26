@@ -23,7 +23,7 @@ public class PlayerUPNP extends AbstractPlayer {
 			super(service.getAction("SetAVTransportURI"));
 			try {
 				setInput("InstanceID", new UnsignedIntegerFourBytes(0));
-				setInput("CurrentURI", url);
+				setInput("CurrentURI", url.replace("x-rincon-mp3radio:", "http"));
 			} catch(Exception e) {
 				e.printStackTrace();
 			}

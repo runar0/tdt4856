@@ -6,13 +6,10 @@ import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 import no.ntnu.eit.skeis.central.devices.player.PlayerSonos;
 import no.ntnu.eit.skeis.central.net.DeviceServerSocket;
+import no.ntnu.eit.skeis.central.net.UPNPDeviceServer;
 import de.kalass.sonoscontrol.api.control.ExecutionMode;
 import de.kalass.sonoscontrol.api.control.SonosDevice;
 import de.kalass.sonoscontrol.api.control.SonosDeviceCallback;
-import de.kalass.sonoscontrol.api.core.Callback0;
-import de.kalass.sonoscontrol.api.model.avtransport.AVTransportURI;
-import de.kalass.sonoscontrol.api.services.AVTransportService;
-import de.kalass.sonoscontrol.cli.commands.CliCommandResultCallback;
 import de.kalass.sonoscontrol.clingimpl.core.SonosControlClingImpl;
 
 public class Central {
@@ -39,11 +36,11 @@ public class Central {
 		deviceServerSocket.startServer(12354);
 		
 		// Start UPNP control point
-		//UPNPDeviceServer upnpDeviceServer = new UPNPDeviceServer(this);
-		//upnpDeviceServer.start();
+		UPNPDeviceServer upnpDeviceServer = new UPNPDeviceServer(this);
+		upnpDeviceServer.start();
 		
 		// TODO Make UPNPDeviceServer and SonosControlClingImpl share a UpnpService instance
-		SonosControlClingImpl sonos = new SonosControlClingImpl();
+		SonosControlClingImpl sonos = new SonosControlClingImpl(upnpDeviceServer.getUpnpService());
 		sonos.executeOnAnyZone(new SonosDeviceCallback() {
 			
 			@Override
