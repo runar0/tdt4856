@@ -2,6 +2,7 @@ package no.ntnu.eit.skeis.central.devices.player;
 
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 
 import org.fourthline.cling.UpnpService;
@@ -117,6 +118,13 @@ public class PlayerUPNP extends AbstractPlayer {
 		/*upnp.getControlPoint().execute(
 			new DefaultActionCallback(new SetUrlActionInvocation(service, url), log)
 		);*/
+	}
+
+	@Override
+	protected void playAudioSource(AudioSource source) {
+		setUrl(source.getHttpUrl());
+		setPlayState(true);
+		setVolume(50);
 	}
 
 }

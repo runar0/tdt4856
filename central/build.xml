@@ -20,6 +20,7 @@
         <pathelement location="../lib/cling-support-2.0-alpha3-sources.jar"/>
         <pathelement location="../lib/cling-core-2.0-alpha3.jar"/>
         <pathelement location="../lib/cling-core-2.0-alpha3-sources.jar"/>
+        <pathelement location="../lib/sonos-control-cli-0.0.1.jar"/>
     </path>
     <target name="init">
         <mkdir dir="bin"/>

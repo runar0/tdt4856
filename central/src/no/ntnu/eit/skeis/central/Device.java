@@ -3,6 +3,7 @@ package no.ntnu.eit.skeis.central;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
+import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
@@ -30,7 +31,7 @@ public class Device {
 		public void onActiveStatusChange(Device device, String sensor_alias);
 	}
 	
-	private static final int INFINITY = -90;
+	private static final int INFINITY = -150;
 	
 	/**
 	 * PlayerConnection this device is related to
@@ -67,6 +68,8 @@ public class Device {
 	 */
 	private AudioSource audio_source;
 	
+	private Logger log;
+	
 	/**
 	 * Construct a new device
 	 * 
@@ -75,6 +78,7 @@ public class Device {
 	 * @param listener
 	 */
 	public Device(String mac, Set<String> sensorAliases, DeviceListener listener) {
+		this.log = Logger.getLogger(getClass().getName());
 		this.mac = mac;
 		this.listener = listener;
 		readings = new HashMap<String, Integer>();
@@ -89,11 +93,29 @@ public class Device {
 		if(mac.toLowerCase().startsWith("a8:26:d9")) {
 			audio_source = new AudioSource() {
 				@Override
-				public String getUrl() {
-					return "x-rincon-mp3radio://192.168.0.1:8080/test";
+				public String getSonosUrl() {
+					return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
+				}
+				@Override
+				public String getHttpUrl() {
+					return "http://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
 				}
 			};
 		}
+		if(mac.toLowerCase().startsWith("f8:db:7f")) {
+			audio_source = new AudioSource() {
+				@Override
+				public String getSonosUrl() {
+					return "x-rincon-mp3radio://lyd.nrk.no/nrk_radio_klassisk_mp3_h";
+				}
+				@Override
+				public String getHttpUrl() {
+					return "http://lyd.nrk.no/nrk_radio_klassisk_mp3_h";
+				}
+			};
+		}
+		
+		
 	}
 	
 	/**
@@ -168,6 +190,7 @@ public class Device {
 			}
 		}
 		if(!alias.equals(closest_sensor)) {
+			log.info("Device "+mac+" new closest, was '"+closest_sensor+"' now '"+alias+"'");
 			closest_sensor = alias;
 			listener.onDeviceNewClosest(this, alias);
 		}

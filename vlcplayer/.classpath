@@ -2,14 +2,14 @@
 <classpath>
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/sonos-control-cli-0.0.1.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-support-2.0-alpha3-sources.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-core-2.0-alpha3-sources.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/protobuf-java-2.5.0.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-support-2.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-core-2.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/seamless-xml-1.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/seamless-http-1.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/seamless-util-1.0-alpha3.jar"/>
+	<classpathentry kind="lib" path="../lib/sonos-control-cli-0.0.1.jar"/>
+	<classpathentry kind="lib" path="../lib/cling-support-2.0-alpha3-sources.jar"/>
+	<classpathentry kind="lib" path="../lib/cling-core-2.0-alpha3-sources.jar"/>
+	<classpathentry kind="lib" path="../lib/protobuf-java-2.5.0.jar"/>
+	<classpathentry kind="lib" path="../lib/cling-support-2.0-alpha3.jar"/>
+	<classpathentry kind="lib" path="../lib/cling-core-2.0-alpha3.jar"/>
+	<classpathentry kind="lib" path="../lib/seamless-xml-1.0-alpha3.jar"/>
+	<classpathentry kind="lib" path="../lib/seamless-http-1.0-alpha3.jar"/>
+	<classpathentry kind="lib" path="../lib/seamless-util-1.0-alpha3.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
