@@ -14,11 +14,4 @@
 	<natures>
 		<nature>org.eclipse.jdt.core.javanature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>protocol</name>
-			<type>2</type>
-			<location>/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/protocol/build</location>
-		</link>
-	</linkedResources>
 </projectDescription>

@@ -18,7 +18,7 @@
 		<link>
 			<name>protocol</name>
 			<type>2</type>
-			<location>/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/protocol/build</location>
+			<locationURI>WORKSPACE_LOC/protocol/build</locationURI>
 		</link>
 	</linkedResources>
 </projectDescription>
