@@ -66,6 +66,10 @@ abstract public class AbstractPlayer implements PlayerInterface {
 			devices.remove(device);
 			device.setPlayerConnection(null);
 		}
+		// If the active device was removed, we need to clear the pointer
+		if(active_device == device) {
+			active_device = null;
+		}
 		updateActivePlayer();
 	}
 

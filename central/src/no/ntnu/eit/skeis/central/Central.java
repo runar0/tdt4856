@@ -48,10 +48,18 @@ public class Central {
 			
 			@Override
 			public ExecutionMode execute(SonosDevice device) {
-				String zone = device.getZoneName().getValue();
+				String alias = null;
+				if(device.getDeviceId().getValue().equals("RINCON_000E586D336E01400")) {
+					// Bridge
+					return ExecutionMode.EACH_DEVICE_DETECTION;
+				} else if(device.getDeviceId().getValue().equals("RINCON_B8E93758042E01400")) {
+					alias = "jon";
+				} else if(device.getDeviceId().getValue().equals("RINCON_B8E937581CDC01400")) {
+					alias = "runar";
+				}
 				player_manager.addPlayer(
-					zone, 
-					new PlayerSonos(player_manager, zone, device)
+					alias, 
+					new PlayerSonos(player_manager, alias, device)
 				);
 				return ExecutionMode.EACH_DEVICE_DETECTION;
 			}

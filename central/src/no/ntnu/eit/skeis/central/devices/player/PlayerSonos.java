@@ -4,7 +4,9 @@ import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import de.kalass.sonoscontrol.api.control.SonosDevice;
+import de.kalass.sonoscontrol.api.core.Callback0;
 import de.kalass.sonoscontrol.api.model.avtransport.AVTransportURI;
+import de.kalass.sonoscontrol.api.services.AVTransportService;
 
 public class PlayerSonos extends AbstractPlayer {
 
@@ -26,11 +28,35 @@ public class PlayerSonos extends AbstractPlayer {
 
 	@Override
 	public void setPlayState(boolean play) {
+		final AVTransportService transport = device.getAVTransportService();
 		if(play) {
-			device.getAVTransportService().setAVTransportURI(AVTransportURI.getInstance(this.url), null, null);
-			device.getAVTransportService().play(null);
+			transport.setAVTransportURI(AVTransportURI.getInstance(this.url), null, new Callback0() {
+                @Override
+                public void success() {
+                	System.out.println("Set url");
+                	transport.play(new Callback0() {
+                		@Override
+                		public void success() {
+                			System.out.println("Started playing");
+                			
+                		}
+                		
+                	});
+                }
+            });
+			
 		} else {
-			device.getAVTransportService().stop(null);
+			transport.stop(new Callback0() {
+				public void success() {
+                	System.out.println("Stopped playback");
+                	transport.removeAllTracksFromQueue(new Callback0() {
+                		@Override
+                		public void success() {
+                			System.out.println("Cleared queue?");
+                		}
+                	});
+                }
+			});
 		}
 	}
 
