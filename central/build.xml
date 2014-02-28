@@ -17,9 +17,7 @@
         <pathelement location="../lib/seamless-http-1.0-alpha3.jar"/>
         <pathelement location="../lib/protobuf-java-2.5.0.jar"/>
         <pathelement location="../lib/cling-support-2.0-alpha3.jar"/>
-        <pathelement location="../lib/cling-support-2.0-alpha3-sources.jar"/>
         <pathelement location="../lib/cling-core-2.0-alpha3.jar"/>
-        <pathelement location="../lib/cling-core-2.0-alpha3-sources.jar"/>
         <pathelement location="../lib/sonos-control-cli-0.0.1.jar"/>
     </path>
     <target name="init">
@@ -81,6 +79,7 @@
             <zipfileset excludes="META-INF/*.SF" src="../lib/seamless-xml-1.0-alpha3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../lib/seamless-http-1.0-alpha3.jar"/>
             <zipfileset excludes="META-INF/*.SF" src="../lib/seamless-util-1.0-alpha3.jar"/>
+            <zipfileset excludes="META-INF/*.SF" src="../lib/sonos-control-cli-0.0.1.jar"/>
         </jar>
     </target>
 </project>

@@ -6,6 +6,7 @@ import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 import no.ntnu.eit.skeis.central.net.DeviceServerSocket;
 import no.ntnu.eit.skeis.central.net.UPNPDeviceServer;
+import no.ntnu.eit.skeis.central.upnp.mediarenderer.CentralMediaRenderer;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.UpnpServiceImpl;
@@ -51,6 +52,8 @@ public class Central {
 				log.info("Stopping");
 			}
 		});
+		
+		upnpDeviceServer.getUpnpService().getRegistry().addDevice(new CentralMediaRenderer().getDevice());
 	}
 	
 	public DeviceTracker getDeviceTracker() {
