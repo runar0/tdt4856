@@ -6,6 +6,8 @@ import java.net.NetworkInterface;
 import java.net.URI;
 import java.net.URISyntaxException;
 
+import no.ntnu.eit.skeis.central.audio.StreamingAudioSource;
+
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.AbstractAVTransportService;
@@ -26,6 +28,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	
 	public CentralAVTransportService() {
 		changeSupport = new PropertyChangeSupport(this);
+		
 	}
 	
 	@Override
@@ -35,7 +38,6 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	}
 	
 	URI currentUri;
-	String currentMeta;
 
 	@Override
 	public void setAVTransportURI(UnsignedIntegerFourBytes instanceId,
@@ -46,7 +48,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 		try {
 			URI uri = new URI(currentURI);
 			this.currentUri = uri;
-			currentMeta = currentURIMetaData;
+
+			//new StreamingAudioSource(uri);
 			
 			System.out.println(uri.getHost());
 			
