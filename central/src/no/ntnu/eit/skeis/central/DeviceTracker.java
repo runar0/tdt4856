@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import no.ntnu.eit.skeis.central.audio.StreamingTest;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 
 /**
@@ -51,8 +52,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 			Device device = new Device(mac, central.getSensorManager().getSensorAliases(), this);
 			devices.put(mac, device);
 		}
-		devices.get(mac).onSensorUpdate(alias, rssi);	
-		System.out.println(this);
+		devices.get(mac).onSensorUpdate(alias, rssi);
 	}
 	
 	public String toString() {
@@ -113,6 +113,18 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 			}
 		}
 		return devices;
+	}
+
+	/**
+	 * Associate a new audio source with the given device
+	 * 
+	 * @param string
+	 * @param audio
+	 */
+	public void associateAudioSource(String mac, StreamingTest audio) {
+		System.out.println("Associate "+mac+" device " +devices.get(mac));
+		devices.get(mac).setAudioSource(audio);
+		
 	}
 	
 }

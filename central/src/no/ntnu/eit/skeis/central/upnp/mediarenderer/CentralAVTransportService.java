@@ -1,17 +1,17 @@
 package no.ntnu.eit.skeis.central.upnp.mediarenderer;
 
 import java.beans.PropertyChangeSupport;
-import java.net.InetAddress;
-import java.net.NetworkInterface;
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.net.Socket;
 import java.net.URI;
-import java.net.URISyntaxException;
 
-import no.ntnu.eit.skeis.central.audio.StreamingAudioSource;
+import no.ntnu.eit.skeis.central.Central;
+import no.ntnu.eit.skeis.central.audio.StreamingTest;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.AbstractAVTransportService;
-import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.fourthline.cling.support.model.DeviceCapabilities;
 import org.fourthline.cling.support.model.MediaInfo;
 import org.fourthline.cling.support.model.PositionInfo;
@@ -26,9 +26,11 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 
 	private final PropertyChangeSupport changeSupport;
 	
-	public CentralAVTransportService() {
+	private final Central central;
+	
+	public CentralAVTransportService(Central central) {
 		changeSupport = new PropertyChangeSupport(this);
-		
+		this.central = central;
 	}
 	
 	@Override
@@ -50,6 +52,41 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			this.currentUri = uri;
 
 			//new StreamingAudioSource(uri);
+			new Thread() {
+				public void run() {
+					try {
+						Socket socket = new Socket(currentUri.getHost(), currentUri.getPort());
+						socket.getOutputStream().write(
+							("GET "+currentUri.getPath()+" HTTP/1.1\r\n" +
+							"Host: "+currentUri.getHost()+":"+currentUri.getPort()+"\r\n\r\n").getBytes()
+						);
+						socket.getOutputStream().flush();
+						BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
+						
+						// Read up until \r\n\r\n
+						int state = 0;
+						int b = 0;
+						while(state < 4 && (b = in.read()) != -1) {
+							if((state == 0 || state == 2) && b == '\r') {
+								state++;
+							} else if ((state == 1 || state == 3) && b == '\n') {
+								state++;
+							} else {
+								//System.out.println("Initial scan reset");
+								state = 0;
+							}
+						}
+						if (b == -1) {
+							throw new IOException("EOF");
+						}
+						System.out.println("HERE");
+						StreamingTest audio = new StreamingTest(in);
+						central.getDeviceTracker().associateAudioSource("a8:26:d9:f2:dc:27", audio);
+					} catch(Exception e) {
+						e.printStackTrace();
+					}
+				};
+			}.start();
 			
 			System.out.println(uri.getHost());
 			

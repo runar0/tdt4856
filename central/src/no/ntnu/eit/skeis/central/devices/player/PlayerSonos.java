@@ -32,6 +32,7 @@ public class PlayerSonos extends AbstractPlayer {
 	public void setPlayState(boolean play) {
 		final AVTransportService transport = device.getAVTransportService();
 		if(play) {
+			System.out.println(this.url);
 			transport.setAVTransportURI(AVTransportURI.getInstance(this.url), null, new Callback0() {
                 @Override
                 public void success() {

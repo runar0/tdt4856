@@ -53,7 +53,7 @@ public class Central {
 			}
 		});
 		
-		upnpDeviceServer.getUpnpService().getRegistry().addDevice(new CentralMediaRenderer().getDevice());
+		upnpDeviceServer.getUpnpService().getRegistry().addDevice(new CentralMediaRenderer(this).getDevice());
 	}
 	
 	public DeviceTracker getDeviceTracker() {

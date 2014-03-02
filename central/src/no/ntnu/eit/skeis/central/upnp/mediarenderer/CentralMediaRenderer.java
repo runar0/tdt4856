@@ -1,5 +1,7 @@
 package no.ntnu.eit.skeis.central.upnp.mediarenderer;
 
+import no.ntnu.eit.skeis.central.Central;
+
 import org.fourthline.cling.binding.LocalServiceBinder;
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
 import org.fourthline.cling.model.DefaultServiceManager;
@@ -24,7 +26,7 @@ public class CentralMediaRenderer {
 	final protected LocalDevice device;
 
 	@SuppressWarnings("unchecked")
-	public CentralMediaRenderer() {
+	public CentralMediaRenderer(final Central central) {
 		LocalServiceBinder binder = new AnnotationLocalServiceBinder();
 		// The connection manager doesn't have to do much, HTTP is stateless
 		LocalService<CentralConnectionManagerService> connectionManagerService = binder
@@ -47,7 +49,7 @@ public class CentralMediaRenderer {
 			@Override
 			protected CentralAVTransportService createServiceInstance()
 					throws Exception {
-				return new CentralAVTransportService();
+				return new CentralAVTransportService(central);
 			}
 		};
 		avTransportService.setManager(avTransport);

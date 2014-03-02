@@ -6,6 +6,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
+import no.ntnu.eit.skeis.central.audio.StreamingTest;
 import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
 
 /**
@@ -90,11 +91,12 @@ public class Device {
 		}
 		
 		// TODO This is just for testing
-		if(mac.toLowerCase().startsWith("a8:26:d9")) {
+		/*if(mac.toLowerCase().startsWith("a8:26:d9")) {
 			audio_source = new AudioSource() {
 				@Override
 				public String getSonosUrl() {
 					return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
+					//return "x-rincon-mp3radio://192.168.0.20:8520";
 				}
 				@Override
 				public String getHttpUrl() {
@@ -113,9 +115,7 @@ public class Device {
 					return "http://lyd.nrk.no/nrk_radio_klassisk_mp3_h";
 				}
 			};
-		}
-		
-		
+		}*/
 	}
 	
 	/**
@@ -240,5 +240,15 @@ public class Device {
 	
 	public String toString() {
 		return mac;
+	}
+
+	/**
+	 * Set new device audio source
+	 * @param audio
+	 */
+	public void setAudioSource(StreamingTest audio) {
+		System.out.println(audio.getHttpUrl());
+		audio_source = audio;
+		listener.onActiveStatusChange(this, closest_sensor);
 	}
 }
