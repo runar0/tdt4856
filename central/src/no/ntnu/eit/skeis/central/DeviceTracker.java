@@ -116,15 +116,13 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	}
 
 	/**
-	 * Associate a new audio source with the given device
+	 * Get device by id, or null if unknown device
 	 * 
-	 * @param string
-	 * @param audio
+	 * @param mac
+	 * @return
 	 */
-	public void associateAudioSource(String mac, StreamingTest audio) {
-		System.out.println("Associate "+mac+" device " +devices.get(mac));
-		devices.get(mac).setAudioSource(audio);
-		
+	public Device getDevice(String mac) {
+		return devices.get(mac);
 	}
 	
 }

@@ -6,9 +6,11 @@ import java.util.Map;
 import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.devices.player.PlayerSonos;
 import no.ntnu.eit.skeis.central.devices.player.PlayerUPNP;
+import no.ntnu.eit.skeis.central.upnp.mediarenderer.CentralMediaRenderer;
 
 import org.fourthline.cling.UpnpService;
 import org.fourthline.cling.model.message.header.STAllHeader;
+import org.fourthline.cling.model.meta.LocalDevice;
 import org.fourthline.cling.model.meta.RemoteDevice;
 import org.fourthline.cling.model.meta.RemoteService;
 import org.fourthline.cling.model.types.ServiceId;
@@ -128,6 +130,13 @@ public class UPNPDeviceServer extends Thread {
 				return ExecutionMode.EACH_DEVICE_DETECTION;
 			}
 		});
+		
+		// Start all media renderes
+		CentralMediaRenderer renderer = new CentralMediaRenderer(central, 3);
+		for(LocalDevice device : renderer.getDevices()) {
+			upnp.getRegistry().addDevice(device);
+			System.out.println(device);
+		}
 		
 		// Keep scanning for devices at regular intervals
 		while(running) {

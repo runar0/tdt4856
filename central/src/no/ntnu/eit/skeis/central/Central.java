@@ -52,8 +52,6 @@ public class Central {
 				log.info("Stopping");
 			}
 		});
-		
-		upnpDeviceServer.getUpnpService().getRegistry().addDevice(new CentralMediaRenderer(this).getDevice());
 	}
 	
 	public DeviceTracker getDeviceTracker() {

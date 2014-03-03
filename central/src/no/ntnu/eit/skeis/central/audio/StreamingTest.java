@@ -1,27 +1,28 @@
 package no.ntnu.eit.skeis.central.audio;
 
+import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.InetAddress;
-import java.net.NetworkInterface;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.net.URI;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Set;
 
+import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.audio.mp3.Frame;
+
+import org.fourthline.cling.support.lastchange.LastChange;
 
 public class StreamingTest implements AudioSource {
 
-	private final ServerSocket server;
-	
-	private final Set<Socket> clients;
+	private final ServerSocket server;	
+	private final Set<Socket> clients;	
+	private final Device device;
 	
 	class ClientConnectionThread extends Thread {
 		@Override
@@ -59,11 +60,10 @@ public class StreamingTest implements AudioSource {
 		}
 	}
 	
-	public StreamingTest(final InputStream in) throws Exception {
-				
-		
+	public StreamingTest(final BufferedInputStream in, final LastChange lastChange, Device device) throws Exception {
+		this.device = device;
 		clients = new HashSet<Socket>();
-		server = new ServerSocket(8520);
+		server = new ServerSocket(0);
 				
 		new ClientConnectionThread().start();
 		
@@ -72,6 +72,7 @@ public class StreamingTest implements AudioSource {
 				try {
 					Frame frame;
 					long time = -1;
+					
 					while((frame = Frame.fromInputStream(in)) != null) {
 						synchronized(clients) {
 							Iterator<Socket> it = clients.iterator();
@@ -108,8 +109,8 @@ public class StreamingTest implements AudioSource {
 		}.start();
 	}
 	
-	public static void main(String[] args) throws Exception {
-		new StreamingTest(new FileInputStream(new File("/home/runar/84.mp3")));
+	public Device getDevice() {
+		return device;
 	}
 
 	@Override
@@ -128,6 +129,11 @@ public class StreamingTest implements AudioSource {
 		} catch(Exception e) {
 			return "";
 		}
+	}
+
+	public void stop() {
+		// TODO Auto-generated method stub
+		
 	}
 	
 }
