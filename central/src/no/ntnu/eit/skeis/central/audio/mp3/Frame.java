@@ -115,6 +115,7 @@ public class Frame {
 		int current = 0, previous = in.read();
 		int dropped = 0;
 		while((current = in.read()) != -1) {
+			System.out.println(previous + " - " + current);
 			if (previous == 0xFF && (current&0xFF) == 0xFB) {
 				// We found the frame header
 				header[0] = (byte)(previous&0xFF);
@@ -141,16 +142,16 @@ public class Frame {
 			return null;
 		}
 		
-		//System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
+		System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
 		
 		Frame frame = new Frame(header);
 		
-		//System.out.println("Bitrate "+frame.getBitrate());
-		//System.out.println("Samplerate "+frame.getSamplerate());
-		//System.out.println("Is padded: "+frame.isPadded());
-		//System.out.println("Frame size:"+frame.getFrameSize());
-		
-		if (frame.getFrameSize() ==0 ) {
+		System.out.println("Bitrate "+frame.getBitrate());
+		System.out.println("Samplerate "+frame.getSamplerate());
+		System.out.println("Is padded: "+frame.isPadded());
+		System.out.println("Frame size:"+frame.getFrameSize());
+		System.exit(1);
+		if (frame.getFrameSize() == 0 ) {
 			frame.setData(new byte[0]);
 			return frame;
 		};

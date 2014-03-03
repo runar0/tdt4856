@@ -88,7 +88,7 @@ public class CentralMediaRenderer {
 						Thread.sleep(500);
 					}
 				} catch (Exception ex) {
-					throw new RuntimeException(ex);
+					//throw new RuntimeException(ex);
 				}
 			}
 		}.start();

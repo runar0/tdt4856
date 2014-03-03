@@ -81,7 +81,9 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			// Read up until \r\n\r\n
 			int state = 0;
 			int b = 0;
+			String header = "";
 			while(state < 4 && (b = in.read()) != -1) {
+				header += new String(new byte[]{(byte)(b&0xFF)});
 				if((state == 0 || state == 2) && b == '\r') {
 					state++;
 				} else if ((state == 1 || state == 3) && b == '\n') {

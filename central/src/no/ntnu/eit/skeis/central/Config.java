@@ -20,5 +20,6 @@ abstract public class Config {
 	
 	static {
 		ipBMacMapping.put("192.168.0.105", "f8:db:7f:04:a0:71");
+		ipBMacMapping.put("192.168.0.124", "a8:26:d9:f2:dc:27");
 	}
 }
