@@ -24,4 +24,16 @@ abstract public class Config {
 		ipBMacMapping.put("192.168.0.105", "f8:db:7f:04:a0:71");
 		ipBMacMapping.put("192.168.0.124", "a8:26:d9:f2:dc:27");
 	}
+	
+
+	/**
+	 * UPNP uuid to alias mapping
+	 */
+	public static Map<String, String> upnpAliases = new HashMap<String, String>();
+	
+	static {
+		upnpAliases.put("RINCON_B8E93758042E01400", "sonos1");
+		upnpAliases.put("RINCON_B8E937581CDC01400", "sonos2");
+	}
+	
 }

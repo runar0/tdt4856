@@ -1,8 +1,5 @@
 package no.ntnu.eit.skeis.central.net;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Config;
 import no.ntnu.eit.skeis.central.devices.player.PlayerSonos;
@@ -37,24 +34,8 @@ import de.kalass.sonoscontrol.clingimpl.core.SonosControlClingImpl;
  */
 public class UPNPDeviceServer extends Thread {
 
-	/**
-	 * UPNP uuid to alias mapping
-	 */
-	private static Map<String, String> aliases;
-	
-	static {
-		aliases = new HashMap<String, String>();
-		// XBMC runar-archy
-		aliases.put("3cdbb3d4-8c1a-d6f0-494f-93fa97d93337", "runar");
-		aliases.put("09527f1f-ab89-bf64-0000-000005ff505c", "runar");
-		aliases.put("c5121ef4-05bf-8d71-ae30-e21f2ad03850", "runar-htpc");
-		
-		aliases.put("RINCON_B8E93758042E01400", "sonos1");
-		aliases.put("RINCON_B8E937581CDC01400", "sonos2");
-	}
-
 	private static String getUUIDAlias(String uuid) {
-		String alias = aliases.get(uuid);
+		String alias = Config.upnpAliases.get(uuid);
 		if(alias == null) {
 			alias = uuid;
 		}
