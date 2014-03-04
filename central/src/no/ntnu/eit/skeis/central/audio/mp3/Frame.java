@@ -15,7 +15,7 @@ import java.io.OutputStream;
 public class Frame {
 
 	private static int[] bitrate = new int[] {
-		0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, 0
+		0, 32, 40, 48, 56, 64, 80, 96, 112, 128, 160, 192, 224, 256, 320, -1
 	};
 	
 	private static int[] samplerate = new int[] {
@@ -61,11 +61,18 @@ public class Frame {
 	 * @return
 	 */
 	public int getFrameSize() {
-		if (getSamplerate() == 0) {
-			System.out.println("Stream out of sync, attempting to resync!");
-			return 10;
-		}
 		return ((144 * getBitrate()*1000) / getSamplerate()) + (isPadded() ? 1 : 0);
+	}
+	
+	/**
+	 * Validate the frame, we should do this by checking that all combinations of data is 
+	 * as expected, in case we synced on a bad header sync byte
+	 * 
+	 * @return
+	 */
+	private boolean isValid() {
+		// TODO Expand
+		return getSamplerate() != 0 && getBitrate() != -1;
 	}
 	
 	private void setData(byte[] data) {
@@ -115,6 +122,7 @@ public class Frame {
 	 */
 	public static Frame fromInputStream(InputStream in) throws IOException {
 		byte[] header = new byte[4];
+		Frame frame;
 		
 		int current = 0, previous = in.read();
 		@SuppressWarnings("unused")
@@ -125,46 +133,50 @@ public class Frame {
 				// We found the frame header
 				header[0] = (byte)(previous&0xFF);
 				header[1] = (byte)(current&0xFF);
+				
+				// Place a mark and create frame a frame instance
+				in.mark(10);				
 				in.read(header, 2, 2);
-				break;
+				frame = new Frame(header);
+				
+				// TODO Validate that the frame is actually valid
+				if(frame.isValid()) {
+					//System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
+					
+					//System.out.println("Bitrate "+frame.getBitrate());
+					//System.out.println("Samplerate "+frame.getSamplerate());
+					//System.out.println("Is padded: "+frame.isPadded());
+					//System.out.println("Frame size:"+frame.getFrameSize());
+					
+					byte[] data = new byte[frame.getFrameSize()-4];
+					in.read(data, 0, data.length);
+					frame.setData(data);
+					
+					return frame;
+				} else {
+					in.reset();
+				}	
 			// HEAD ID3
 			} else if(previous == 'I' && current == 'D') {
-				dropped++;
+				in.mark(1);
 				if ((previous = in.read()) == '3') {
-					dropped += skipID3Tag(in);
+					dropped += skipID3Tag(in) + 1;
+				} else {
+					in.reset();
 				}
 			// Tail TAG
 			} else if(previous == 'T' && current == 'A') {
-				dropped++;
+				in.mark(1);;
 				if ((previous = in.read()) == 'G') {
 					return null;
+				} else {
+					in.reset();
 				}
 			}
 			dropped ++;
 			previous = current;
 		}
-		if(current == -1)  {
-			return null;
-		}
-		
-		//System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
-		
-		Frame frame = new Frame(header);
-		
-		//System.out.println("Bitrate "+frame.getBitrate());
-		//System.out.println("Samplerate "+frame.getSamplerate());
-		//System.out.println("Is padded: "+frame.isPadded());
-		//System.out.println("Frame size:"+frame.getFrameSize());
-
-		if (frame.getFrameSize() == 0 ) {
-			frame.setData(new byte[0]);
-			return frame;
-		};
-		byte[] data = new byte[frame.getFrameSize()-4];
-		in.read(data, 0, data.length);
-		frame.setData(data);
-		
-		return frame;
+		return null;
 		
 	}
 
