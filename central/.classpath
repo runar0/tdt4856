@@ -1,14 +1,22 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="src"/>
-	<classpathentry kind="src" path="protocol"/>
-	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
-	<classpathentry kind="lib" path="../lib/sonos-control-cli-0.0.1.jar"/>
-	<classpathentry kind="lib" path="../lib/protobuf-java-2.5.0.jar"/>
-	<classpathentry kind="lib" path="../lib/cling-core-2.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="../lib/seamless-xml-1.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="../lib/seamless-http-1.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="../lib/seamless-util-1.0-alpha3.jar"/>
-	<classpathentry kind="lib" path="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-support-2.0-alpha3.jar" sourcepath="/mnt/documents/documents/NTNU/TDT4856 EiT - Styring av moderne hus/prototype/lib/cling-support-2.0-alpha3-sources.jar"/>
-	<classpathentry kind="output" path="bin"/>
+  <classpathentry kind="src" path="src/test/java" output="target/test-classes" including="**/*.java"/>
+  <classpathentry kind="src" path="src/main/java" including="**/*.java"/>
+  <classpathentry kind="src" path="/home/runar/Desktop/tdt4856/protocol/build" including="**/*.java"/>
+  <classpathentry kind="output" path="target/classes"/>
+  <classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+  <classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/fourthline/cling/cling-core/2.0-alpha3/cling-core-2.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/seamless/seamless-util/1.0-alpha3/seamless-util-1.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/seamless/seamless-http/1.0-alpha3/seamless-http-1.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/seamless/seamless-xml/1.0-alpha3/seamless-xml-1.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/fourthline/cling/cling-support/2.0-alpha3/cling-support-2.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/seamless/seamless-swing/1.0-alpha3/seamless-swing-1.0-alpha3.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/protobuf/protobuf-java/2.5.0/protobuf-java-2.5.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/SonosControl/sonos-control-api/0.0.1/sonos-control-api-0.0.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/SonosControl/sonos-control-api-clingimpl/0.0.1/sonos-control-api-clingimpl-0.0.1.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/guava/guava/11.0/guava-11.0.jar"/>
+  <classpathentry kind="var" path="M2_REPO/com/google/code/findbugs/jsr305/1.3.9/jsr305-1.3.9.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-api/1.6.4/slf4j-api-1.6.4.jar"/>
+  <classpathentry kind="var" path="M2_REPO/org/slf4j/slf4j-simple/1.6.4/slf4j-simple-1.6.4.jar"/>
 </classpath>
