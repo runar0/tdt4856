@@ -61,6 +61,10 @@ public class Frame {
 	 * @return
 	 */
 	public int getFrameSize() {
+		if (getSamplerate() == 0) {
+			System.out.println("Stream out of sync, attempting to resync!");
+			return 10;
+		}
 		return ((144 * getBitrate()*1000) / getSamplerate()) + (isPadded() ? 1 : 0);
 	}
 	
@@ -113,9 +117,10 @@ public class Frame {
 		byte[] header = new byte[4];
 		
 		int current = 0, previous = in.read();
+		@SuppressWarnings("unused")
 		int dropped = 0;
 		while((current = in.read()) != -1) {
-			System.out.println(previous + " - " + current);
+			//System.out.println(previous + " - " + current);
 			if (previous == 0xFF && (current&0xFF) == 0xFB) {
 				// We found the frame header
 				header[0] = (byte)(previous&0xFF);
@@ -142,15 +147,15 @@ public class Frame {
 			return null;
 		}
 		
-		System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
+		//System.out.println("Found MP3 frame header after dropping "+dropped+" bytes");
 		
 		Frame frame = new Frame(header);
 		
-		System.out.println("Bitrate "+frame.getBitrate());
-		System.out.println("Samplerate "+frame.getSamplerate());
-		System.out.println("Is padded: "+frame.isPadded());
-		System.out.println("Frame size:"+frame.getFrameSize());
-		System.exit(1);
+		//System.out.println("Bitrate "+frame.getBitrate());
+		//System.out.println("Samplerate "+frame.getSamplerate());
+		//System.out.println("Is padded: "+frame.isPadded());
+		//System.out.println("Frame size:"+frame.getFrameSize());
+
 		if (frame.getFrameSize() == 0 ) {
 			frame.setData(new byte[0]);
 			return frame;

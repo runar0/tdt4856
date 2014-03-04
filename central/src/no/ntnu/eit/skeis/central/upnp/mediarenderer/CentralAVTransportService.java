@@ -7,9 +7,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.logging.Logger;
 
-import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Device;
-import no.ntnu.eit.skeis.central.audio.StreamingTest;
+import no.ntnu.eit.skeis.central.audio.StreamingSource;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
@@ -24,7 +23,6 @@ import org.fourthline.cling.support.model.TransportAction;
 import org.fourthline.cling.support.model.TransportInfo;
 import org.fourthline.cling.support.model.TransportSettings;
 import org.fourthline.cling.support.model.TransportState;
-import org.fourthline.cling.support.model.TransportStatus;
 
 public class CentralAVTransportService extends AbstractAVTransportService {
 	
@@ -64,57 +62,59 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 		killStreamServer();
 		
 		if (currentURI == null || getDevice() == null) {
-			log.info("Did not start streaming server, either no URI or (probably) no device found!");
+			log.info(instance+ ": Did not start streaming server, either no URI or (probably) no device found!");
 			return;
 		}
 		
-		try {
-			// Do intial http connection
-			Socket socket = new Socket(currentURI.getHost(), currentURI.getPort());
-			socket.getOutputStream().write(
-				("GET "+currentURI.getPath()+" HTTP/1.1\r\n" +
-				"Host: "+currentURI.getHost()+":"+currentURI.getPort()+"\r\n\r\n").getBytes()
-			);
-			socket.getOutputStream().flush();
-			BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
-			
-			// Read up until \r\n\r\n
-			int state = 0;
-			int b = 0;
-			String header = "";
-			while(state < 4 && (b = in.read()) != -1) {
-				header += new String(new byte[]{(byte)(b&0xFF)});
-				if((state == 0 || state == 2) && b == '\r') {
-					state++;
-				} else if ((state == 1 || state == 3) && b == '\n') {
-					state++;
-				} else {
-					//System.out.println("Initial scan reset");
-					state = 0;
+		new Thread() {
+			public void run() {
+				try {
+					// Do initial http connection
+					Socket socket = new Socket(currentURI.getHost(), currentURI.getPort());
+					socket.getOutputStream().write(
+						("GET "+currentURI.getPath()+" HTTP/1.1\r\n" +
+						"Host: "+currentURI.getHost()+":"+currentURI.getPort()+"\r\n\r\n").getBytes()
+					);
+					socket.getOutputStream().flush();
+					BufferedInputStream in = new BufferedInputStream(socket.getInputStream());
+					
+					// Read up until \r\n\r\n
+					int state = 0;
+					int b = 0;
+					String header = "";
+					while(state < 4 && (b = in.read()) != -1) {
+						header += new String(new byte[]{(byte)(b&0xFF)});
+						if((state == 0 || state == 2) && b == '\r') {
+							state++;
+						} else if ((state == 1 || state == 3) && b == '\n') {
+							state++;
+						} else {
+							state = 0;
+						}
+					}
+					if (b == -1) {
+						throw new IOException("EOF");
+					}
+					
+					log.info(instance+ ": Started stream server "+instance);
+					
+					// Hand the remainder of the stream and controller device to the streaming server 
+					mediarenderer.setStreamingServer(instance, new StreamingSource(socket, in, getLastChange(), getDevice()));
+				} catch(Exception e) {
+					e.printStackTrace();
 				}
-			}
-			if (b == -1) {
-				throw new IOException("EOF");
-			}
-			
-			// Hand the remainder of the stream to the streaming server and let the device know
-			mediarenderer.setStreamingServer(instance, new StreamingTest(in, getLastChange(), getDevice()));			
-			getDevice().setAudioSource(mediarenderer.getStreamingServer(instance));		
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
+			};
+		}.start();
+		
 	}
 	
 	/**
 	 * Kill stream server if it is running
 	 */
 	private void killStreamServer() {
-		StreamingTest streamingServer = mediarenderer.getStreamingServer(instance);
+		StreamingSource streamingServer = mediarenderer.getStreamingServer(instance);
 		if(streamingServer != null) {
-			if (getDevice() != null) {
-				// Deactivate device
-				getDevice().setAudioSource(null);
-			}
+			log.info(instance + ": Attempting to kill stream");
 			streamingServer.stop();
 		}
 	}
@@ -143,7 +143,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 				new AVTransportVariable.AVTransportURI(this.currentURI)
 		);
 		
-		System.out.println(instanceId.getValue()+": setAVTransportURI "+currentURI + " meta: "+currentURIMetaData);		
+		System.out.println(instance+": setAVTransportURI "+currentURI + " meta: "+currentURIMetaData);		
 	}
 	
 	@Override
@@ -186,7 +186,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	public void stop(UnsignedIntegerFourBytes instanceId)
 			throws AVTransportException {
 
-		System.out.println("Stop");		
+		System.out.println(instance+ ": Stop");		
 		killStreamServer();
 		
 		transportInfo = new TransportInfo(TransportState.STOPPED);		
@@ -199,7 +199,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	@Override
 	public void play(UnsignedIntegerFourBytes instanceId, String speed)
 			throws AVTransportException {
-		System.out.println("Play");
+		System.out.println(instance+ ": Play");
 		
 		// TODO Start streaming server, associate with device
 		createStreamServer();
@@ -251,7 +251,10 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			UnsignedIntegerFourBytes instanceId) throws Exception {
 		return new TransportAction[] { 
 			TransportAction.Play, 
-			TransportAction.Stop 
+			TransportAction.Stop,
+			TransportAction.Pause,
+			TransportAction.Previous,
+			TransportAction.Next,
 		};
 	}
 

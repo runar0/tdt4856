@@ -6,7 +6,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
-import no.ntnu.eit.skeis.central.audio.StreamingTest;
+import no.ntnu.eit.skeis.central.audio.StreamingSource;
 import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
 
 /**
@@ -246,8 +246,11 @@ public class Device {
 	 * Set new device audio source
 	 * @param audio
 	 */
-	public void setAudioSource(StreamingTest audio) {
-		System.out.println(audio.getHttpUrl());
+	public void setAudioSource(StreamingSource audio) {
+		if (audio_source != null) {
+			audio_source = null;
+			listener.onActiveStatusChange(this, closest_sensor);			
+		}
 		audio_source = audio;
 		listener.onActiveStatusChange(this, closest_sensor);
 	}

@@ -17,6 +17,8 @@ abstract public class Config {
 	 */
 	public static final Map<String, String> ipBMacMapping = new HashMap<String, String>();
 	
+	public static final int NUM_MEDIA_RENDERERS = 2;
+	
 	
 	static {
 		ipBMacMapping.put("192.168.0.105", "f8:db:7f:04:a0:71");

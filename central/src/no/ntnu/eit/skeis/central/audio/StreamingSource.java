@@ -2,6 +2,8 @@ package no.ntnu.eit.skeis.central.audio;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -22,7 +24,7 @@ import no.ntnu.eit.skeis.central.audio.mp3.Frame;
 
 import org.fourthline.cling.support.lastchange.LastChange;
 
-public class StreamingTest implements AudioSource {
+public class StreamingSource implements AudioSource {
 
 	private final Logger log;
 	
@@ -32,7 +34,9 @@ public class StreamingTest implements AudioSource {
 	
 	private final Queue<Frame> frameBuffer;
 	
+	private final Socket sourceSocket;
 	private final InputStream in;
+	private final LastChange lastChange;
 	
 	private boolean drained = false;
 	
@@ -54,7 +58,7 @@ public class StreamingTest implements AudioSource {
 						String line;
 						while((line = reader.readLine()) != null) {
 							if(line.trim().equals("")) break;
-							System.out.println(line);
+							//System.out.println(line);
 						}
 						
 						OutputStream out = s.getOutputStream();
@@ -92,11 +96,21 @@ public class StreamingTest implements AudioSource {
 				log.info("Starting stream drain");
 				while((frame = Frame.fromInputStream(in)) != null) {
 					frameBuffer.add(frame);
+					try { Thread.sleep(10); } catch(Exception e) {}
 				}
 				drained = true;
 				log.info("Drained stream");
+			} catch(IOException ioe) {
+				log.info("Error reading source stream, stopping.");
 			} catch(Exception e) {
 				e.printStackTrace();
+			} finally {
+				try {
+					if (sourceSocket != null) {
+						sourceSocket.close();
+					}
+					in.close();
+				} catch(IOException e) {}
 			}
 		}
 	}
@@ -110,17 +124,22 @@ public class StreamingTest implements AudioSource {
 	class ClientFeedThread extends Thread {
 		@Override
 		public void run() {
-			// Delay startup by 100ms, just to give the drained a head start
-			try { Thread.sleep(100); } catch(Exception e) {}
+			for(int i = 0; i < 20; i++) { try { Thread.sleep(100); } catch(Exception e) {} }
 			
 			Frame frame;
 			long time = -1;
+			int count = 0;
 			
 			while(true) {
 				try {
 					frame = frameBuffer.remove();
 				} catch(NoSuchElementException e) {
-					// TODO Buffer under-run, we should handle this!
+					// If we're not under-run delay for a bit and keep going
+					if (!drained) {
+						for(int i = 0; i < 20; i++) { try { Thread.sleep(100); } catch(Exception ex) {} }
+						continue;
+					}
+					// If we're drained we kill the thread
 					log.info("Client feeder buffer underrun!");
 					break;
 				}
@@ -139,25 +158,52 @@ public class StreamingTest implements AudioSource {
 					}
 				}
 				if (time != -1) {
-					long diff = 26+System.currentTimeMillis()-time;
+					//long diff = 26+System.currentTimeMillis()-time;
+					long diff = 25+System.currentTimeMillis()-time;
 					try { Thread.sleep(diff); } catch(Exception e) {}
 				}
 				time = System.currentTimeMillis();
 			}
+			
+			// Close all client connections if any are still open
+			synchronized(clients) {
+				Iterator<Socket> it = clients.iterator();
+				while(it.hasNext()) {
+					try {
+						it.next().close();
+					} catch(Exception e) {
+						// ignore
+					}
+				}
+			}
+			
+			// If we've reached the end, unregister ourselves with the device
+			if(frameBuffer.size() == 0) {
+				device.setAudioSource(null);
+			}
 		}
 	}
 	
-	public StreamingTest(final BufferedInputStream in, final LastChange lastChange, Device device) throws Exception {
+	public StreamingSource(Socket socket, final BufferedInputStream in, final LastChange lastChange, Device device) throws Exception {
 		log = Logger.getLogger(getClass().getName());
 		this.device = device;
+		sourceSocket = socket;
 		this.in = in;
+		this.lastChange = lastChange;
 		frameBuffer = new ConcurrentLinkedQueue<Frame>();
 		clients = new HashSet<Socket>();
 		server = new ServerSocket(0);
+		System.out.println(server.getLocalPort());
 
 		new SourceReaderThread().start();
 		new ClientConnectionThread().start();
 		new ClientFeedThread().start();
+
+		device.setAudioSource(this);
+	}
+	
+	public static void main(String[] args) throws Exception {
+		new StreamingSource(null, new BufferedInputStream(new FileInputStream(new File("/home/runar/84.mp3"))), null, null);
 	}
 	
 	public Device getDevice() {
@@ -184,18 +230,21 @@ public class StreamingTest implements AudioSource {
 
 	public void stop() {
 		try {
-			// Not really a team player here, close all resources and hope that all our threads die in peace			
-			in.close();
-			server.close();
+			log.info("Closing stream endpoints");
+			// Not really a team player here, close all resources and hope that all our threads die in peace		
 			synchronized(clients) {
+				log.info("Killing all client connections");
 				for(Socket client : clients) {
 					client.close();
 				}
-			}
+			}	
+			server.close();
+			in.close();
 		} catch (IOException ioe) {
-			
+			ioe.printStackTrace();
 		}
-		
+		device.setAudioSource(null);
+		log.info("Killed stream");		
 	}
 	
 }

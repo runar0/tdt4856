@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import no.ntnu.eit.skeis.central.Central;
+import no.ntnu.eit.skeis.central.Config;
 import no.ntnu.eit.skeis.central.devices.player.PlayerSonos;
 import no.ntnu.eit.skeis.central.devices.player.PlayerUPNP;
 import no.ntnu.eit.skeis.central.upnp.mediarenderer.CentralMediaRenderer;
@@ -132,7 +133,7 @@ public class UPNPDeviceServer extends Thread {
 		});
 		
 		// Start all media renderes
-		CentralMediaRenderer renderer = new CentralMediaRenderer(central, 3);
+		CentralMediaRenderer renderer = new CentralMediaRenderer(central, Config.NUM_MEDIA_RENDERERS);
 		for(LocalDevice device : renderer.getDevices()) {
 			upnp.getRegistry().addDevice(device);
 			System.out.println(device);

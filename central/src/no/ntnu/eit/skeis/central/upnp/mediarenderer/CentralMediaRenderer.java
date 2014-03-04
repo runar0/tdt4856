@@ -5,7 +5,7 @@ import java.util.logging.Logger;
 import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Config;
 import no.ntnu.eit.skeis.central.Device;
-import no.ntnu.eit.skeis.central.audio.StreamingTest;
+import no.ntnu.eit.skeis.central.audio.StreamingSource;
 
 import org.fourthline.cling.binding.LocalServiceBinder;
 import org.fourthline.cling.binding.annotations.AnnotationLocalServiceBinder;
@@ -43,7 +43,7 @@ public class CentralMediaRenderer {
 	final protected ServiceManager<CentralConnectionManagerService>[] connectionManagers;
 	final protected ServiceManager<CentralAVTransportService>[] avTransports;
 	final protected ServiceManager<CentralAudioRenderingControl>[] renderingControls;
-	final protected StreamingTest[] streamingServers;	
+	final protected StreamingSource[] streamingServers;	
 	final protected LocalDevice[] devices;
 
 	final protected LastChange avTransportLastChange = new LastChange(
@@ -53,6 +53,7 @@ public class CentralMediaRenderer {
 
 	final protected Central central;
 
+	@SuppressWarnings("unchecked")
 	public CentralMediaRenderer(final Central central, int num_endpoints) {
 		log = Logger.getLogger(getClass().getName());
 		this.central = central;
@@ -60,10 +61,10 @@ public class CentralMediaRenderer {
 		avTransports = new ServiceManager[num_endpoints];
 		renderingControls = new ServiceManager[num_endpoints];
 		devices = new LocalDevice[num_endpoints];
-		streamingServers = new StreamingTest[num_endpoints];
+		streamingServers = new StreamingSource[num_endpoints];
 		
 		buildDevices(num_endpoints);
-		runLastChangePushThread();
+		//runLastChangePushThread();
 	}
 
 	/**
@@ -154,16 +155,19 @@ public class CentralMediaRenderer {
 			LocalDevice device;
 			try {
 				device = new LocalDevice(new DeviceIdentity(
-						UDN.uniqueSystemIdentifier("SKEIS Central "+i)),
-						new UDADeviceType("MediaRenderer", 1), new DeviceDetails(
-								"SKEIS Central "+i,
-								new ManufacturerDetails("Cling",
-										"http://github.com/Runar0/tdt4856"),
-								new ModelDetails("SKEIS Central MediaRenderer",
-										"Test", "1",
-										"http://github.com/Runar0/tdt4856")),
-						new LocalService[] { avTransportService,
-								renderingControlService, connectionManagerService });
+					UDN.uniqueSystemIdentifier("SKEIS Central "+i)),
+					new UDADeviceType("MediaRenderer", 1), 
+					new DeviceDetails(
+						"SKEIS Central "+i,
+						new ManufacturerDetails("SKEIS", "http://github.com/Runar0/tdt4856"),
+						new ModelDetails("SKEIS Central MediaRenderer")
+					),
+					new LocalService[] { 
+						avTransportService,
+						renderingControlService, 
+						connectionManagerService 
+					}
+				);
 			} catch (ValidationException ex) {
 				throw new RuntimeException(ex);
 			}
@@ -194,11 +198,11 @@ public class CentralMediaRenderer {
 		return getCentral().getDeviceTracker().getDevice(mac);
 	}
 	
-	public void setStreamingServer(int instance, StreamingTest server) {
+	public void setStreamingServer(int instance, StreamingSource server) {
 		streamingServers[instance] = server;
 	}
 	
-	public StreamingTest getStreamingServer(int instance) {
+	public StreamingSource getStreamingServer(int instance) {
 		return streamingServers[instance];
 	}
 

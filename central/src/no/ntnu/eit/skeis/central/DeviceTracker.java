@@ -6,7 +6,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import no.ntnu.eit.skeis.central.audio.StreamingTest;
+import no.ntnu.eit.skeis.central.audio.StreamingSource;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
 
 /**

@@ -24,7 +24,6 @@ public class PlayerSonos extends AbstractPlayer {
 	
 	@Override
 	public void setUrl(String url) {
-		log.info("PlayerSONOS set url: "+url);
 		this.url = url;
 	}
 
