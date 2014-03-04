@@ -5,15 +5,15 @@
 dist: 
 	if [ ! -d "./dist" ]; then mkdir dist; fi
 	cd protocol; make
-	cd sensor; ant; mv -v sensor.jar ../dist/
-	cd vlcplayer; ant; mv -v vlcplayer.jar ../dist/
-	cd central; ant; mv -v central.jar ../dist/
+	cd sensor; mvn package; mv -v target/sensor-1.0-SNAPSHOT.jar ../dist/sensor.jar
+	cd vlcplayer; mvn package; mv -v target/vlcplayer-1.0-SNAPSHOT.jar ../dist/vlcplayer.jar
+	cd central; mvn package; mv -v target/central-1.0-SNAPSHOT.jar ../dist/central.jar
 
 .PHONY: clean
 clean:
-	cd sensor; ant clean
-	cd vlcplayer; ant clean
-	cd central; ant clean
+	cd sensor; mvn clean
+	cd vlcplayer; mvn clean
+	cd central; mvn clean
 	
 .PHONY: clean
 purge: clean
