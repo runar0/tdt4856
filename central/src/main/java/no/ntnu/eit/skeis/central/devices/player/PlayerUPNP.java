@@ -127,4 +127,22 @@ public class PlayerUPNP extends AbstractPlayer {
 		setVolume(50);
 	}
 
+	@Override
+	public int getVolume() {
+		// TODO Auto-generated method stub
+		return 0;
+	}
+
+	@Override
+	public void setMute(boolean flag) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public boolean getMute() {
+		// TODO Auto-generated method stub
+		return false;
+	}
+
 }

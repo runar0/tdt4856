@@ -1,36 +1,35 @@
 package no.ntnu.eit.skeis.central.upnp.mediarenderer;
 
-import no.ntnu.eit.skeis.central.Device;
+import no.ntnu.eit.skeis.central.audio.StreamingSource;
 
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.model.types.UnsignedIntegerTwoBytes;
-import org.fourthline.cling.support.lastchange.LastChange;
 import org.fourthline.cling.support.model.Channel;
 import org.fourthline.cling.support.renderingcontrol.AbstractAudioRenderingControl;
 import org.fourthline.cling.support.renderingcontrol.RenderingControlException;
+import org.fourthline.cling.support.renderingcontrol.lastchange.ChannelMute;
+import org.fourthline.cling.support.renderingcontrol.lastchange.ChannelVolume;
+import org.fourthline.cling.support.renderingcontrol.lastchange.RenderingControlVariable;
 
 public class CentralAudioRenderingControl extends AbstractAudioRenderingControl {
 
 	private final CentralMediaRenderer mediarenderer;
 	private final int instance;
 	
-	private UnsignedIntegerTwoBytes volume;
-	private boolean mute;
+	private final Channel[] channels = new Channel[] { Channel.Master };
 	
-	private final Channel[] channels = new Channel[] { Channel.LF, Channel.RF };
-	
-	public CentralAudioRenderingControl(CentralMediaRenderer mediarenderer, int instance, LastChange lastChange) {
-		super(lastChange);
+	public CentralAudioRenderingControl(CentralMediaRenderer mediarenderer, int instance) {
 		this.mediarenderer = mediarenderer;
 		this.instance = instance;
-		
-		volume = new UnsignedIntegerTwoBytes(100);
-		mute = false;
+	}
+	
+	private StreamingSource getStream() {
+		return mediarenderer.getStreamingServer(instance);
 	}
 
 	@Override
 	public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
-		return new UnsignedIntegerFourBytes[] { new UnsignedIntegerFourBytes(0) };
+		return new UnsignedIntegerFourBytes[] { new UnsignedIntegerFourBytes(0), new UnsignedIntegerFourBytes(0) };
 	}
 
 	@Override
@@ -41,19 +40,22 @@ public class CentralAudioRenderingControl extends AbstractAudioRenderingControl 
 	@Override
 	public boolean getMute(UnsignedIntegerFourBytes instanceId,
 			String channelName) throws RenderingControlException {
-		return mute;
+		if(getStream() != null) {
+			return getStream().getMute();
+		}
+		return false;
 	}
 
 	@Override
 	public void setMute(UnsignedIntegerFourBytes instanceId,
 			String channelName, boolean desiredMute)
 			throws RenderingControlException {
-		mute = desiredMute; 
-		if(mediarenderer.getStreamingServer(instance) != null) {
-			Device d = mediarenderer.getStreamingServer(instance).getDevice();
-			if(d.getPlayerConnection() != null) {
-				d.getPlayerConnection().setVolume((mute ? 0 : 50));
-			}
+		if(getStream() != null) {
+			getStream().setMute(desiredMute);
+			getLastChange().setEventedValue(
+				instanceId,
+				new RenderingControlVariable.Mute(new ChannelMute(Channel.Master, getStream().getMute()))
+			);			
 		}
 		
 	}
@@ -62,19 +64,22 @@ public class CentralAudioRenderingControl extends AbstractAudioRenderingControl 
 	public UnsignedIntegerTwoBytes getVolume(
 			UnsignedIntegerFourBytes instanceId, String channelName)
 			throws RenderingControlException {
-		return volume;
+		if(getStream() != null) {
+			return new UnsignedIntegerTwoBytes(getStream().getVolume());
+		}
+		return new UnsignedIntegerTwoBytes(0);
 	}
 
 	@Override
 	public void setVolume(UnsignedIntegerFourBytes instanceId,
 			String channelName, UnsignedIntegerTwoBytes desiredVolume)
 			throws RenderingControlException {
-		volume = desiredVolume; 
-		if(mediarenderer.getStreamingServer(instance) != null) {
-			Device d = mediarenderer.getStreamingServer(instance).getDevice();
-			if(d.getPlayerConnection() != null) {
-				d.getPlayerConnection().setVolume((int)Math.min(volume.getValue(), 80));
-			}
+		if(getStream() != null) {
+			getStream().setVolume(desiredVolume.getValue().intValue());
+			getLastChange().setEventedValue(
+				instanceId,
+				new RenderingControlVariable.Volume(new ChannelVolume(Channel.Master, getStream().getVolume()))
+			);			
 		}
 	}
 

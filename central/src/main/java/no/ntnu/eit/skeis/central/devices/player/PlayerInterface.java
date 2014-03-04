@@ -37,6 +37,12 @@ public interface PlayerInterface {
 	 */
 	public abstract void setVolume(int volume);
 
+	public abstract int getVolume();
+	
+	public abstract void setMute(boolean flag);
+	
+	public abstract boolean getMute();
+
 	/**
 	 * Register a new device to this player
 	 * 

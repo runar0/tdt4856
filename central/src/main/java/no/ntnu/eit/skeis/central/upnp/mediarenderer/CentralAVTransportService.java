@@ -1,5 +1,6 @@
 package no.ntnu.eit.skeis.central.upnp.mediarenderer;
 
+import java.beans.PropertyChangeSupport;
 import java.io.BufferedInputStream;
 import java.io.IOException;
 import java.net.Socket;
@@ -10,6 +11,7 @@ import java.util.logging.Logger;
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.audio.StreamingSource;
 
+import org.fourthline.cling.model.ModelUtil;
 import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
 import org.fourthline.cling.support.avtransport.AVTransportException;
 import org.fourthline.cling.support.avtransport.AbstractAVTransportService;
@@ -38,8 +40,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	private PositionInfo positionInfo = new PositionInfo();
 	private TransportInfo transportInfo = new TransportInfo(TransportState.STOPPED);
 		
-	public CentralAVTransportService(CentralMediaRenderer mediarenderer, int instance, LastChange lastChange) {
-		super(lastChange);
+	public CentralAVTransportService(CentralMediaRenderer mediarenderer, int instance) {
 		log = Logger.getLogger(getClass().getName());
 		this.mediarenderer = mediarenderer;
 		this.instance = instance;
@@ -116,12 +117,21 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 		if(streamingServer != null) {
 			log.info(instance + ": Attempting to kill stream");
 			streamingServer.stop();
+			mediarenderer.setStreamingServer(instance, null);
 		}
+	}
+	
+	public PositionInfo getPositionInfo() {
+		StreamingSource streamingServer = mediarenderer.getStreamingServer(instance);
+		if(streamingServer != null) {
+			positionInfo = new PositionInfo(positionInfo, streamingServer.getPosition(), streamingServer.getDuration());
+		}
+		return positionInfo;
 	}
 	
 	@Override
 	public UnsignedIntegerFourBytes[] getCurrentInstanceIds() {
-		return new UnsignedIntegerFourBytes[] { new UnsignedIntegerFourBytes(0) };
+		return new UnsignedIntegerFourBytes[] { new UnsignedIntegerFourBytes(0), new UnsignedIntegerFourBytes(1) };
 	}
 
 	@Override
@@ -138,9 +148,9 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 		mediaInfo = new MediaInfo(currentURI, currentURIMetaData);
 		positionInfo = new PositionInfo(1, currentURIMetaData, currentURI);
 		getLastChange().setEventedValue(
-				instanceId, 
-				new AVTransportVariable.CurrentTrackURI(this.currentURI),
-				new AVTransportVariable.AVTransportURI(this.currentURI)
+			instanceId, 
+			new AVTransportVariable.CurrentTrackURI(this.currentURI),
+			new AVTransportVariable.AVTransportURI(this.currentURI)
 		);
 		
 		System.out.println(instance+": setAVTransportURI "+currentURI + " meta: "+currentURIMetaData);		
@@ -167,7 +177,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	@Override
 	public PositionInfo getPositionInfo(UnsignedIntegerFourBytes instanceId)
 			throws AVTransportException {
-		return positionInfo;
+		return getPositionInfo();
 	}
 
 	@Override
@@ -201,12 +211,11 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			throws AVTransportException {
 		System.out.println(instance+ ": Play");
 		
-		// TODO Start streaming server, associate with device
 		createStreamServer();
 
 		transportInfo = new TransportInfo(TransportState.PLAYING);	
 		getLastChange().setEventedValue(
-			instanceId.getValue().intValue(), 
+			instanceId,
 			new AVTransportVariable.TransportState(TransportState.PLAYING)
 		);
 	}
@@ -222,8 +231,13 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	}
 
 	@Override
-	public void seek(UnsignedIntegerFourBytes instanceId, String unit,
-			String target) throws AVTransportException {
+	public void seek(UnsignedIntegerFourBytes instanceId, String unit, String target) throws AVTransportException {
+		System.out.println(instanceId + " seek "+unit + " "+target);
+		StreamingSource streamingServer = mediarenderer.getStreamingServer(instance);
+		if(streamingServer != null) {
+			log.info(instance + ": seeking to "+target);
+			streamingServer.seek(ModelUtil.fromTimeString(target));
+		}
 	}
 
 	@Override
@@ -252,9 +266,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 		return new TransportAction[] { 
 			TransportAction.Play, 
 			TransportAction.Stop,
-			TransportAction.Pause,
-			TransportAction.Previous,
-			TransportAction.Next,
+			TransportAction.Seek
 		};
 	}
 

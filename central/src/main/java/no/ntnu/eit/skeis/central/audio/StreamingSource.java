@@ -11,18 +11,22 @@ import java.io.OutputStream;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Queue;
 import java.util.Set;
-import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.audio.mp3.Frame;
 
+import org.fourthline.cling.model.ModelUtil;
+import org.fourthline.cling.model.types.UnsignedIntegerFourBytes;
+import org.fourthline.cling.support.avtransport.lastchange.AVTransportVariable;
 import org.fourthline.cling.support.lastchange.LastChange;
+import org.fourthline.cling.support.model.TransportState;
 
 public class StreamingSource implements AudioSource {
 
@@ -32,11 +36,14 @@ public class StreamingSource implements AudioSource {
 	private final Set<Socket> clients;	
 	private final Device device;
 	
-	private final Queue<Frame> frameBuffer;
+	private final List<Frame> frameBuffer;
 	
 	private final Socket sourceSocket;
 	private final InputStream in;
 	private final LastChange lastChange;
+	
+	private int totalFrames = 0;
+	private int currentFrame = 0;
 	
 	private boolean drained = false;
 	
@@ -96,7 +103,7 @@ public class StreamingSource implements AudioSource {
 				log.info("Starting stream drain");
 				while((frame = Frame.fromInputStream(in)) != null) {
 					frameBuffer.add(frame);
-					try { Thread.sleep(10); } catch(Exception e) {}
+					totalFrames++;
 				}
 				drained = true;
 				log.info("Drained stream");
@@ -128,14 +135,14 @@ public class StreamingSource implements AudioSource {
 			
 			Frame frame;
 			long time = -1;
-			int count = 0;
 			
 			while(true) {
 				try {
-					frame = frameBuffer.remove();
-				} catch(NoSuchElementException e) {
-					// If we're not under-run delay for a bit and keep going
+					frame = frameBuffer.get(currentFrame);
+				} catch(IndexOutOfBoundsException e) {
+					// If we're catching up delay for a bit and keep going
 					if (!drained) {
+						log.info("Client underrun, pausing "+currentFrame + " of "+totalFrames);
 						for(int i = 0; i < 20; i++) { try { Thread.sleep(100); } catch(Exception ex) {} }
 						continue;
 					}
@@ -146,6 +153,8 @@ public class StreamingSource implements AudioSource {
 				
 				synchronized(clients) {
 					Iterator<Socket> it = clients.iterator();
+					// Skip if we have nothing i.e. currentFrame is stationary
+					if(!it.hasNext()) continue;
 					while(it.hasNext()) {
 						Socket client = it.next();
 						try {
@@ -157,6 +166,15 @@ public class StreamingSource implements AudioSource {
 						}
 					}
 				}
+
+				currentFrame++;
+				if(currentFrame > 0 && currentFrame % 500 == 0) {
+					lastChange.setEventedValue(new UnsignedIntegerFourBytes(0), 
+						new AVTransportVariable.AbsoluteTimePosition(getDuration()),
+						new AVTransportVariable.RelativeTimePosition(getPosition())
+					);
+				}
+				
 				if (time != -1) {
 					long diff = 26+System.currentTimeMillis()-time;
 					try { Thread.sleep(diff); } catch(Exception e) {}
@@ -189,7 +207,7 @@ public class StreamingSource implements AudioSource {
 		sourceSocket = socket;
 		this.in = in;
 		this.lastChange = lastChange;
-		frameBuffer = new ConcurrentLinkedQueue<Frame>();
+		frameBuffer = new ArrayList<Frame>();
 		clients = new HashSet<Socket>();
 		server = new ServerSocket(0);
 		System.out.println(server.getLocalPort());
@@ -244,6 +262,51 @@ public class StreamingSource implements AudioSource {
 		}
 		device.setAudioSource(null);
 		log.info("Killed stream");		
+	}
+	
+	// TODO We need some kind of device on new player connection event
+	
+	private boolean muted;
+	private int volume;
+
+	public boolean getMute() {
+		return muted;
+	}
+	
+	public void setMute(boolean flag) {
+		muted = flag;
+		if(getDevice().getPlayerConnection() != null) {
+			getDevice().getPlayerConnection().setMute(muted);
+		}
+	}
+	
+	public int getVolume() {
+		return volume;
+	}
+	
+	public void setVolume(int volume) {
+		this.volume = volume;
+		if(getDevice().getPlayerConnection() != null) {
+			getDevice().getPlayerConnection().setVolume(volume);
+		}
+	}
+
+	public String getDuration() {
+		return ModelUtil.toTimeString((totalFrames*26)/1000);
+	}
+	
+	public String getPosition() {
+		return ModelUtil.toTimeString((currentFrame*26)/1000);		
+	}
+
+	public void seek(long time) {
+		currentFrame = (int) Math.floor((time*1000)/26);
+		lastChange.setEventedValue(new UnsignedIntegerFourBytes(0), 
+			new AVTransportVariable.AbsoluteTimePosition(getDuration()),
+			new AVTransportVariable.RelativeTimePosition(getPosition()),
+			new AVTransportVariable.TransportState(TransportState.PLAYING)
+		);
+		
 	}
 	
 }

@@ -72,7 +72,7 @@ public class Frame {
 	 */
 	private boolean isValid() {
 		// TODO Expand
-		return getSamplerate() != 0 && getBitrate() != -1;
+		return getSamplerate() != 0 && getBitrate() != -1 && getFrameSize() > 4;
 	}
 	
 	private void setData(byte[] data) {
@@ -103,7 +103,10 @@ public class Frame {
 	private static int skipID3Tag(InputStream in) throws IOException {
 		// We assume that the 3 byte tag has been read
 		byte buffer[] = new byte[7];
-		in.read(buffer);
+		int read = 0;
+		while(read < buffer.length) {
+			read += in.read(buffer);
+		}
 		
 		int size = (buffer[6]&0x7F) + ((buffer[5]&0x7F) << 7) + ((buffer[4]&0x7F) << 14) + ((buffer[3]&0x7F) << 21);
 		//System.out.println("ID3 tag size "+size);
@@ -123,6 +126,7 @@ public class Frame {
 	public static Frame fromInputStream(InputStream in) throws IOException {
 		byte[] header = new byte[4];
 		Frame frame;
+		int read = 0;
 		
 		int current = 0, previous = in.read();
 		@SuppressWarnings("unused")
@@ -135,8 +139,17 @@ public class Frame {
 				header[1] = (byte)(current&0xFF);
 				
 				// Place a mark and create frame a frame instance
-				in.mark(10);				
-				in.read(header, 2, 2);
+				in.mark(10);
+				
+				read = 0;
+				while(read < 2) {
+					read += in.read(header, 2+read, 2-read);
+					
+				}
+				if(read != 2) {
+					System.out.print("Read is only "+read+"!");
+					System.exit(1);
+				}
 				frame = new Frame(header);
 				
 				// TODO Validate that the frame is actually valid
@@ -149,8 +162,17 @@ public class Frame {
 					//System.out.println("Frame size:"+frame.getFrameSize());
 					
 					byte[] data = new byte[frame.getFrameSize()-4];
-					in.read(data, 0, data.length);
+					
+					read = 0;
+					while(read < data.length) {
+						read += in.read(data, read, data.length-read);						
+					}
+
 					frame.setData(data);
+					if(read != data.length) {
+						System.out.println("Read is only "+read+" expected "+data.length);
+						System.exit(1);
+					}
 					
 					return frame;
 				} else {

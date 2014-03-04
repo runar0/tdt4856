@@ -46,10 +46,6 @@ public class CentralMediaRenderer {
 	final protected StreamingSource[] streamingServers;	
 	final protected LocalDevice[] devices;
 
-	final protected LastChange avTransportLastChange = new LastChange(
-			new AVTransportLastChangeParser());
-	final protected LastChange renderingControlLastChange = new LastChange(
-			new RenderingControlLastChangeParser());
 
 	final protected Central central;
 
@@ -64,7 +60,7 @@ public class CentralMediaRenderer {
 		streamingServers = new StreamingSource[num_endpoints];
 		
 		buildDevices(num_endpoints);
-		//runLastChangePushThread();
+		runLastChangePushThread();
 	}
 
 	/**
@@ -134,7 +130,7 @@ public class CentralMediaRenderer {
 				@Override
 				protected CentralAVTransportService createServiceInstance()
 						throws Exception {
-					return new CentralAVTransportService(that, instance, avTransportLastChange);
+					return new CentralAVTransportService(that, instance);
 				}
 			};
 			avTransportService.setManager(avTransport);
@@ -147,7 +143,7 @@ public class CentralMediaRenderer {
 				@Override
 				protected CentralAudioRenderingControl createServiceInstance()
 						throws Exception {
-					return new CentralAudioRenderingControl(that, instance, renderingControlLastChange);
+					return new CentralAudioRenderingControl(that, instance);
 				}
 			};
 			renderingControlService.setManager(renderingControl);
