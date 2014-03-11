@@ -1,9 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
+	<classpathentry including="**/*.java" kind="src" output="target/test-classes" path="src/test/java"/>
 	<classpathentry kind="src" path="protocol"/>
-	<classpathentry kind="src" path="src/main/java"/>
+	<classpathentry including="**/*.java" kind="src" path="src/main/java"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
 	<classpathentry kind="var" path="M2_REPO/junit/junit/3.8.1/junit-3.8.1.jar"/>
+	<classpathentry kind="var" path="M2_REPO/com/googlecode/soundlibs/jlayer/1.0.1-1/jlayer-1.0.1-1.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/fourthline/cling/cling-core/2.0-alpha3/cling-core-2.0-alpha3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/seamless/seamless-util/1.0-alpha3/seamless-util-1.0-alpha3.jar"/>
 	<classpathentry kind="var" path="M2_REPO/org/seamless/seamless-http/1.0-alpha3/seamless-http-1.0-alpha3.jar"/>

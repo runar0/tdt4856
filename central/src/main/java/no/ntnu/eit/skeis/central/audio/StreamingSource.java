@@ -2,7 +2,6 @@ package no.ntnu.eit.skeis.central.audio;
 
 import java.io.BufferedInputStream;
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,10 +14,10 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
-import java.util.NoSuchElementException;
 import java.util.Set;
 import java.util.logging.Logger;
 
+import javazoom.jl.converter.Converter;
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.audio.mp3.Frame;
 
@@ -219,10 +218,6 @@ public class StreamingSource implements AudioSource {
 		device.setAudioSource(this);
 	}
 	
-	public static void main(String[] args) throws Exception {
-		new StreamingSource(null, new BufferedInputStream(new FileInputStream(new File("/home/runar/84.mp3"))), null, null);
-	}
-	
 	public Device getDevice() {
 		return device;
 	}
@@ -308,5 +303,25 @@ public class StreamingSource implements AudioSource {
 		);
 		
 	}
+	
+	public static void main(String[] args) throws Exception  {
+		
+		FileInputStream inputStream = new FileInputStream("8.mp3");
+		Converter c = new Converter();
+		c.convert(inputStream, "out.wav", null, null);
+		
+	}
+	
+	static short[] concatArrays(short[] A, short[] B) {
+
+        int aLen = A.length;
+        int bLen = B.length;
+        short[] C= new short[aLen+bLen];
+
+        System.arraycopy(A, 0, C, 0, aLen);
+        System.arraycopy(B, 0, C, aLen, bLen);
+
+        return C;
+    }
 	
 }

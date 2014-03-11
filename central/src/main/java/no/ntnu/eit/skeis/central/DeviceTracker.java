@@ -28,6 +28,21 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 		
 		central.getSensorManager().addListener(this);
 		
+		final DeviceTracker that = this;		
+		new Thread("DeviceUpdate") {
+			public void run() {
+				while(true) {
+					try {
+						for(Device d : devices.values()) {
+							d.updateClosestSensor();
+						}
+						System.out.println(that);
+						Thread.sleep(500);
+					} catch(InterruptedException e) {}
+				}
+			};
+		}.start();
+		
 	}
 
 	@Override
@@ -77,10 +92,11 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	 * Called by a device when it has detected that it has a new closest sensor
 	 */
 	@Override
-	public void onDeviceNewClosest(Device device, String sensor_alias) {
+	public void onDeviceClosestSensor(Device device, String sensor_alias) {
 		if (!device.isActive()) {
 			return;
 		}
+		
 		// Let the player manager know about the new device position
 		central.getPlayerManager().updateDevicePosition(sensor_alias, device);
 	}
@@ -91,7 +107,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	@Override
 	public void onActiveStatusChange(Device device, String sensor_alias) {
 		if(device.isActive()) {
-			onDeviceNewClosest(device, sensor_alias); 
+			onDeviceClosestSensor(device, sensor_alias); 
 		} else {
 			central.getPlayerManager().removeDevice(device);
 		}

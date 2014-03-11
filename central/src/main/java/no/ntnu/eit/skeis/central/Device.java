@@ -20,11 +20,12 @@ public class Device {
 
 	public interface DeviceListener {
 		/**
-		 * Called when a device has a new closest sensor
+		 * Called by a device after it has updated its readings
+		 * 
 		 * @param device
 		 * @param sensor_alias
 		 */
-		public void onDeviceNewClosest(Device device, String sensor_alias);
+		public void onDeviceClosestSensor(Device device, String sensor_alias);
 		
 		/**
 		 * Called when the active status of a player changes
@@ -32,7 +33,40 @@ public class Device {
 		public void onActiveStatusChange(Device device, String sensor_alias);
 	}
 	
-	private static final int INFINITY = -150;
+	/**
+	 * Sensor reading container
+	 * 
+	 * @author Runar B. Olsen <runar.b.olsen@gmail.com>
+	 */
+	private class SensorReading {
+		private double distance = INFINITY;
+		private long timestamp = System.currentTimeMillis();
+		
+		/**
+		 * Update reading with a new distance
+		 * 
+		 * @param distance
+		 */
+		public void updateDistance(double distance) {
+			// TODO Do we take into consideration time between readings as well?
+			this.distance = distance;
+			timestamp = System.currentTimeMillis();
+		}
+		
+		/**
+		 * Get reading distance
+		 */
+		public double getDistance() {
+			// Age reading by 1 meter per 10 s TODO evaluate!
+			double age = (System.currentTimeMillis()-timestamp) / 10000.0;
+			return distance + age;
+		}
+	}
+	
+	/**
+	 * 'Infinity', any distance larger than this will be ignored
+	 */
+	private static final double INFINITY = 500;
 	
 	/**
 	 * PlayerConnection this device is related to
@@ -42,7 +76,7 @@ public class Device {
 	/**
 	 * Store readings for each of the sensors
 	 */
-	private Map<String, Integer> readings;
+	private Map<String, SensorReading> readings;
 	
 	/**
 	 * Device id
@@ -82,7 +116,7 @@ public class Device {
 		this.log = Logger.getLogger(getClass().getName());
 		this.mac = mac;
 		this.listener = listener;
-		readings = new HashMap<String, Integer>();
+		readings = new HashMap<String, SensorReading>();
 		last_update = System.currentTimeMillis();
 		
 		// Emulate a attach event for all already attached sensors
@@ -150,7 +184,7 @@ public class Device {
 	 * @param alias
 	 */
 	public void onSensorAttach(String alias) {
-		readings.put(alias, INFINITY);
+		readings.put(alias, new SensorReading());
 		
 	}
 
@@ -161,39 +195,42 @@ public class Device {
 	 * @param rssi
 	 */
 	public void onSensorUpdate(String alias, int rssi) {
-		last_update = System.currentTimeMillis();
-		readings.put(alias, rssi);
+		// Convert rssi to distance
+		double A = Config.getClientAValue(alias, mac);
+		double n = Config.getSensorNValue(alias);
+		double distance = Math.pow(10.0, -(((double) rssi)+A)/10.0*n);
+		
+		// Update sensor reading
+		SensorReading reading = readings.get(alias);
+		reading.updateDistance(distance);
+				
+		// Check if we got a new closest sensor 
 		updateClosestSensor();
 	}
 	
 	/**
 	 * Get the last sensor reading
 	 * 
-	 * TODO We need to consider filtering of the data, and implement the rssi->distance calculation
 	 * @param alias
 	 * @return
 	 */
-	public int getLastReading(String alias) {
-		return readings.get(alias);
+	public double getLastReading(String alias) {
+		return readings.get(alias).getDistance();
 	}
 	
 	/**
-	 * Update closest sensor, and notify the device listener if it has changed
+	 * Called by the device tracker when it wants us to re-evaluate our closest sensor
 	 */
-	private void updateClosestSensor() {
-		int min = INFINITY;
+	public void updateClosestSensor() {
+		double min = INFINITY;
 		String alias = "";
 		for(String sensor : readings.keySet()) {
-			if(readings.get(sensor) > min) {
-				min = readings.get(sensor);
+			if(readings.get(sensor).getDistance() < min) {
+				min = readings.get(sensor).getDistance();
 				alias = sensor;
 			}
 		}
-		if(!alias.equals(closest_sensor)) {
-			log.info("Device "+mac+" new closest, was '"+closest_sensor+"' now '"+alias+"'");
-			closest_sensor = alias;
-			listener.onDeviceNewClosest(this, alias);
-		}
+		listener.onDeviceClosestSensor(this, alias);
 	}
 	
 	/**
