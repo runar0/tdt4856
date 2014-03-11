@@ -49,7 +49,11 @@ public class Device {
 		 */
 		public void updateDistance(double distance) {
 			// TODO Do we take into consideration time between readings as well?
-			this.distance = distance;
+			if(this.distance >= INFINITY) {
+				this.distance = distance;
+			} else {
+				this.distance = (1-Config.SENSOR_READING_COEFF)*this.distance + (Config.SENSOR_READING_COEFF)*distance;
+			}
 			timestamp = System.currentTimeMillis();
 		}
 		

@@ -15,6 +15,8 @@ import sun.rmi.runtime.Log;
  */
 abstract public class Config {
 
+	public static final double SENSOR_READING_COEFF = 0.8;
+	
 	/**
 	 * Static mapping between wifi ips and bluetooth mac addresses
 	 */
