@@ -62,11 +62,22 @@ public class ApiServer extends Thread {
 						break;
 					}
 				}
+				
+				// Write response header, we always succeed and handle any errors in the json
+				socket.getOutputStream().write((
+					"HTTP/1.1 OK\r\n"+
+					"Content-Type: application/json\r\n"+
+					"Connection: close\r\n"+
+					"\r\n"
+				).getBytes());
+				
 				if(params != null && params.containsKey("action")) {
 					if(params.get("action").equals("mapDevice")) {
 						socket.getOutputStream().write(
 							handleMapDevice(params.get("mac"), socket.getInetAddress().getHostAddress(), params.get("alias")).getBytes()
 						);
+					} else if(params.get("action").equals("status")) {
+						socket.getOutputStream().write("{ \"status\": 1}\r\n".getBytes());
 					}
 				}
 				
