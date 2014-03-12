@@ -2,7 +2,7 @@
 
 apt-get update
 #apt-get upgrade -y
-apt-get install build-essential openjdk-7-jdk ant bluez bluez-hcidump -y
+apt-get install build-essential openjdk-7-jdk ant bluez bluez-hcidump maven2 -y
 
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre
 export PATH=/usr/lib/jvm/java-7-openjdk-i386/jre/bin:$PATH
