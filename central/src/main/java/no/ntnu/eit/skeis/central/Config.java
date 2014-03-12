@@ -26,8 +26,9 @@ abstract public class Config {
 	
 	
 	static {
-		ipBMacMapping.put("192.168.0.105", "f8:db:7f:04:a0:71");
-		ipBMacMapping.put("192.168.0.124", "a8:26:d9:f2:dc:27");
+		ipBMacMapping.put("192.168.43.69", "98:b8:e3:82:6e:28");
+		ipBMacMapping.put("192.168.43.119", "b8:5e:7b:2a:c9:5c");
+		ipBMacMapping.put("192.168.43.10", "a8:26:d9:f2:dc:27");
 	}
 	
 
@@ -54,7 +55,7 @@ abstract public class Config {
 		if(sensorNValues.containsKey(sensor)) {
 			return sensorNValues.get(sensor);
 		}
-		Logger.getLogger(Config.class.getName()).info("Missing N value for sensor "+sensor+"!");
+		//Logger.getLogger(Config.class.getName()).info("Missing N value for sensor "+sensor+"!");
 		return 0.2;
 	}
 	
@@ -74,10 +75,10 @@ abstract public class Config {
 			if(map.containsKey(sensor)) {
 				return map.get(sensor);
 			}
-			Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+" for sensor "+sensor+"!");
+			//Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+" for sensor "+sensor+"!");
 			return 45;
 		}
-		Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+"!");
+		//Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+"!");
 		return 45;
 	}
 }

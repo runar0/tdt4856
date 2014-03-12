@@ -129,12 +129,12 @@ public class Device {
 		}
 		
 		// TODO This is just for testing
-		/*if(mac.toLowerCase().startsWith("a8:26:d9")) {
+		if(mac.toLowerCase().startsWith("a8:26:d9")) {
 			audio_source = new AudioSource() {
 				@Override
 				public String getSonosUrl() {
-					return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
-					//return "x-rincon-mp3radio://192.168.0.20:8520";
+					//return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
+					return "x-rincon-mp3radio://10.0.0.1:8080/test";
 				}
 				@Override
 				public String getHttpUrl() {
@@ -153,7 +153,7 @@ public class Device {
 					return "http://lyd.nrk.no/nrk_radio_klassisk_mp3_h";
 				}
 			};
-		}*/
+		}
 	}
 	
 	/**
