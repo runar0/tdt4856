@@ -2,7 +2,7 @@
 
 apt-get update
 #apt-get upgrade -y
-apt-get install build-essential openjdk-7-jdk ant bluez bluez-hcidump maven2 -y
+apt-get install build-essential openjdk-7-jdk ant bluez bluez-hcidump -y
 
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre
 export PATH=/usr/lib/jvm/java-7-openjdk-i386/jre/bin:$PATH
@@ -29,10 +29,10 @@ fi
 
 # Build our project
 cd /source
-make
+#make
 
 # Execute sensor app
 cd /source/dist
-source /vagrant/settings.sh
-java -jar sensor.jar $CENTRAL_HOST $CENTRAL_PORT $SENSOR_ALIAS
+#source /vagrant/settings.sh
+java -jar sensor.jar sonos2
 
