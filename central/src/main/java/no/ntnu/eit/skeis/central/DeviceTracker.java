@@ -36,7 +36,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 						for(Device d : devices.values()) {
 							d.updateClosestSensor();
 						}
-						System.out.println(that);
+						//System.out.println(that);
 						Thread.sleep(500);
 					} catch(InterruptedException e) {}
 				}

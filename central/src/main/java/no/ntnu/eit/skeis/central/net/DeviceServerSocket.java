@@ -31,8 +31,6 @@ public class DeviceServerSocket extends Thread {
 	private Central central;
 	private int port;
 	
-	private Beacon beacon;
-	
 	private Logger log;
 	
 	public DeviceServerSocket(Central central) {
@@ -59,15 +57,10 @@ public class DeviceServerSocket extends Thread {
 		// Start client accepting thread, make sure its not a daemon
 		setDaemon(false);
 		start();
-		
-		// Start beacon for device auto discover
-		beacon = new Beacon(this);
-		beacon.start();
 	}
 	
 	public void stopServer() {
 		running = false;
-		beacon.stopBeacon();
 		try {
 			if (ss != null) {
 				ss.close();

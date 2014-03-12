@@ -7,5 +7,6 @@ option java_outer_classname = "BeaconProtos";
 message CentralBeacon {
     required int64 server_version = 1;
     required int32 sensor_port = 2;
-    required int32 player_port = 3;
+    required int32 api_port = 3;
+    required int64 server_id = 4; 
 }

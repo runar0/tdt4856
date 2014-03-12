@@ -22,14 +22,10 @@ abstract public class Config {
 	 */
 	public static final Map<String, String> ipBMacMapping = new HashMap<String, String>();
 	
+	/**
+	 * Number of media renderer endpoints to expose
+	 */
 	public static final int NUM_MEDIA_RENDERERS = 2;
-	
-	
-	static {
-		ipBMacMapping.put("192.168.43.69", "98:b8:e3:82:6e:28");
-		ipBMacMapping.put("192.168.43.119", "b8:5e:7b:2a:c9:5c");
-		ipBMacMapping.put("192.168.43.10", "a8:26:d9:f2:dc:27");
-	}
 	
 
 	/**

@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.Central;
+import no.ntnu.eit.skeis.central.api.ApiServer;
 import no.ntnu.eit.skeis.protocol.BeaconProtos.CentralBeacon;
 
 /**
@@ -33,12 +34,14 @@ public class Beacon extends Thread {
 	private static final long BEACON_GAP = 5*1000;
 	
 	private boolean running;
-	private DeviceServerSocket server;
+	private DeviceServerSocket deviceServer;
+	private ApiServer apiServer;
 	
 	private Logger log;
 	
-	public Beacon(DeviceServerSocket server) {
-		this.server = server;
+	public Beacon(DeviceServerSocket deviceServer, ApiServer apiServer) {
+		this.deviceServer = deviceServer;
+		this.apiServer = apiServer;
 		log = Logger.getLogger(getClass().getName());
 	}
 	
@@ -48,6 +51,7 @@ public class Beacon extends Thread {
 	
 	@Override
 	public void run() {
+		long id = System.currentTimeMillis();
 		running = true;
 		
 		log.info("Beacon thread starting");
@@ -65,8 +69,9 @@ public class Beacon extends Thread {
 			try {
 				CentralBeacon beaconPackage = CentralBeacon.newBuilder()
 						.setServerVersion(Central.VERSION)
-						.setSensorPort(server.getPort())
-						.setPlayerPort(server.getPort())
+						.setSensorPort(deviceServer.getPort())
+						.setApiPort(apiServer.getPort())
+						.setServerId(id)
 						.build();
 				ByteArrayOutputStream data = new ByteArrayOutputStream();
 				beaconPackage.writeDelimitedTo(data);

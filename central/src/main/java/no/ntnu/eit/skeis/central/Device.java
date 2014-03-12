@@ -129,7 +129,7 @@ public class Device {
 		}
 		
 		// TODO This is just for testing
-		if(mac.toLowerCase().startsWith("a8:26:d9")) {
+		/*if(mac.toLowerCase().startsWith("a8:26:d9")) {
 			audio_source = new AudioSource() {
 				@Override
 				public String getSonosUrl() {
@@ -153,7 +153,7 @@ public class Device {
 					return "http://lyd.nrk.no/nrk_radio_klassisk_mp3_h";
 				}
 			};
-		}
+		}*/
 	}
 	
 	/**
