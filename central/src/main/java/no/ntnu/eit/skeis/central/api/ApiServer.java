@@ -65,7 +65,7 @@ public class ApiServer extends Thread {
 				if(params != null && params.containsKey("action")) {
 					if(params.get("action").equals("mapDevice")) {
 						socket.getOutputStream().write(
-							handleMapDevice(params.get("mac"), socket.getInetAddress().getHostAddress()).getBytes()
+							handleMapDevice(params.get("mac"), socket.getInetAddress().getHostAddress(), params.get("alias")).getBytes()
 						);
 					}
 				}
@@ -90,9 +90,10 @@ public class ApiServer extends Thread {
 	 * @param ip
 	 * @return
 	 */
-	private String handleMapDevice(String mac, String ip) {
-		log.info("Mapping device "+mac+"<->"+ip);
+	private String handleMapDevice(String mac, String ip, String alias) {
+		log.info("Mapping device "+mac+"<->"+ip + "("+alias+")");
 		Config.ipBMacMapping.put(ip, mac);
+		Config.deviceAliases.put(mac, alias);
 		
 		return "OK";
 	}

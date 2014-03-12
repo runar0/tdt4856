@@ -8,9 +8,27 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".MainActivity" >
 
-    <TextView
+    <EditText
+        android:id="@+id/aliasText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/hello_world" />
+        android:layout_alignParentLeft="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginLeft="24dp"
+        android:layout_marginTop="21dp"
+        android:ems="10"
+        android:text="Client Alias" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignLeft="@+id/aliasText"
+        android:layout_below="@+id/aliasText"
+        android:layout_marginTop="18dp"
+        android:text="Start Scanning" />
 
 </RelativeLayout>

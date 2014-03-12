@@ -21,6 +21,8 @@ abstract public class Config {
 	 * Static mapping between wifi ips and bluetooth mac addresses
 	 */
 	public static final Map<String, String> ipBMacMapping = new HashMap<String, String>();
+
+	public static final Map<String, String> deviceAliases = new HashMap<String, String>();
 	
 	/**
 	 * Number of media renderer endpoints to expose

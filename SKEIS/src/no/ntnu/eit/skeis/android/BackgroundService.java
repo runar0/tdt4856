@@ -32,9 +32,12 @@ public class BackgroundService extends Service {
 		private long serverId = 0;
 		private Vibrator v;
 		
-		public Lookout(String mac, Vibrator v) {
+		private String alias = "";
+		
+		public Lookout(String mac, Vibrator v, String alias) {
 			this.v = v;
 			this.mac = mac;
+			this.alias = alias;
 		}
 		
 		@Override
@@ -61,7 +64,7 @@ public class BackgroundService extends Service {
 							
 							Socket apisocket = new Socket(packet.getAddress().getHostAddress(), beacon.getApiPort());
 							apisocket.getOutputStream().write((
-								"GET /?action=mapDevice&mac="+mac+" HTTP/1.1\r\n"+
+								"GET /?action=mapDevice&mac="+mac+"&alias="+alias+" HTTP/1.1\r\n"+
 								"\r\n"
 							).getBytes());
 							apisocket.getOutputStream().flush();
@@ -98,10 +101,10 @@ public class BackgroundService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		BluetoothAdapter bluetooth = BluetoothAdapter.getDefaultAdapter();		
-		 Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
-		
+		Vibrator v = (Vibrator) getSystemService(VIBRATOR_SERVICE);
+				 
 		// Start background lookout thread
-		lookout = new Lookout(bluetooth.getAddress().toLowerCase(), v);
+		lookout = new Lookout(bluetooth.getAddress().toLowerCase(), v, intent.getExtras().get("alias").toString());
 		lookout.setPriority(Thread.MIN_PRIORITY);
 		lookout.start();
 		
@@ -109,7 +112,7 @@ public class BackgroundService extends Service {
 		Toast.makeText(this, "SKEIS Central Lookout started", Toast.LENGTH_LONG).show();
 		
 		// Make sure we're restarted if killed
-		return START_STICKY;
+return START_REDELIVER_INTENT;
 	}
 	
 	@Override

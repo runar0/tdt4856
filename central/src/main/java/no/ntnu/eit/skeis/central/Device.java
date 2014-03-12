@@ -166,6 +166,15 @@ public class Device {
 	}
 	
 	/**
+	 * Get device alias, or null if none exists
+	 * 
+	 * @return
+	 */
+	public String getAlias() {
+		return Config.deviceAliases.get(mac);
+	}
+	
+	/**
 	 * Time stamp of last update
 	 * 
 	 * @return
@@ -280,7 +289,7 @@ public class Device {
 	}
 	
 	public String toString() {
-		return mac;
+		return (getAlias() == null ? mac : getAlias());
 	}
 
 	/**
