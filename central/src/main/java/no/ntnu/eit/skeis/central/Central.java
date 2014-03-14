@@ -2,8 +2,10 @@ package no.ntnu.eit.skeis.central;
 
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.api.ApiServer;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import no.ntnu.eit.skeis.central.devices.SensorManager;
+import no.ntnu.eit.skeis.central.net.Beacon;
 import no.ntnu.eit.skeis.central.net.DeviceServerSocket;
 import no.ntnu.eit.skeis.central.net.UPNPDeviceServer;
 
@@ -21,6 +23,8 @@ public class Central {
 	private final SensorManager sensor_manager;
 	private final PlayerManager player_manager;
 	private final DeviceTracker tracker;
+	private final ApiServer api_server;
+	private final Beacon beacon;
 	
 	public static void main(String[] args) throws Exception {
 		new Central();
@@ -35,6 +39,14 @@ public class Central {
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);
 		
+		// Start API server
+		api_server = new ApiServer(12355);
+		api_server.start();
+		
+		// Start Beacon server
+		beacon = new Beacon(deviceServerSocket, api_server);
+		beacon.start();
+		
 		// Start UPNP control point
 
 		final UpnpService upnp = new UpnpServiceImpl();
@@ -46,6 +58,9 @@ public class Central {
 			public void run() {
 				// Stop servers
 				deviceServerSocket.stopServer();
+				api_server.stopServer();
+				beacon.stopBeacon();
+				
 				upnpDeviceServer.stopDeviceServer();				
 				upnp.shutdown();
 				

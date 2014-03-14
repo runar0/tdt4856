@@ -133,8 +133,8 @@ public class Device {
 			audio_source = new AudioSource() {
 				@Override
 				public String getSonosUrl() {
-					return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
-					//return "x-rincon-mp3radio://192.168.0.20:8520";
+					//return "x-rincon-mp3radio://nrk-mms-live.online.no/nrk_radio_mp3_mp3_h";
+					return "x-rincon-mp3radio://10.0.0.1:8080/test";
 				}
 				@Override
 				public String getHttpUrl() {
@@ -163,6 +163,15 @@ public class Device {
 	 */
 	public String getId() {
 		return mac;
+	}
+	
+	/**
+	 * Get device alias, or null if none exists
+	 * 
+	 * @return
+	 */
+	public String getAlias() {
+		return Config.deviceAliases.get(mac);
 	}
 	
 	/**
@@ -280,7 +289,7 @@ public class Device {
 	}
 	
 	public String toString() {
-		return mac;
+		return (getAlias() == null ? mac : getAlias());
 	}
 
 	/**

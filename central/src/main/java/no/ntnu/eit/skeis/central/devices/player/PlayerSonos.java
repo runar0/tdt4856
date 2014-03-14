@@ -1,27 +1,20 @@
 package no.ntnu.eit.skeis.central.devices.player;
 
-import java.util.logging.Logger;
-
 import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import de.kalass.sonoscontrol.api.control.SonosDevice;
 import de.kalass.sonoscontrol.api.core.Callback0;
 import de.kalass.sonoscontrol.api.model.avtransport.AVTransportURI;
-import de.kalass.sonoscontrol.api.model.renderingcontrol.Channel;
-import de.kalass.sonoscontrol.api.model.renderingcontrol.Mute;
-import de.kalass.sonoscontrol.api.model.renderingcontrol.MuteChannel;
 import de.kalass.sonoscontrol.api.model.renderingcontrol.Volume;
 import de.kalass.sonoscontrol.api.services.AVTransportService;
 
 public class PlayerSonos extends AbstractPlayer {
 
 	private SonosDevice device;
-	private Logger log;
 	
 	public PlayerSonos(PlayerManager manager, String alias, SonosDevice device) {
 		super(manager, alias);
 		this.device = device;
-		log = Logger.getLogger(getClass().getName());
 	}
 	
 	private String url;
@@ -53,19 +46,19 @@ public class PlayerSonos extends AbstractPlayer {
 	@Override
 	public void setVolume(int volume) {
 		
-		Volume v = Volume.getInstance((long) Math.floor(((double)Volume.MAX-Volume.MIN)/100.0 * volume) + Volume.MIN);
+		/*Volume v = Volume.getInstance((long) Math.floor(((double)Volume.MAX-Volume.MIN)/100.0 * volume) + Volume.MIN);
 		
 		device.getRenderingControlService().setVolume(Channel.MASTER, v, new Callback0() {
             @Override
             public void success() {
             	log.info(getAlias() + " volume set");
             }
-        });
+        });*/
 	}
 	
 	public int getVolume() {
 		if(volume == null) {
-			return 10; // TODO 
+			volume = Volume.getInstance((long) Math.floor(((double)Volume.MAX-Volume.MIN)/100.0 * 40) + Volume.MIN); // TODO 
 		}
 		return volume.getValue().intValue();
 	}
@@ -73,7 +66,7 @@ public class PlayerSonos extends AbstractPlayer {
 	private boolean muted = false;
 	
 	public void setMute(boolean flag) {
-		if(flag) {
+		/*if(flag) {
 			device.getRenderingControlService().setMute(MuteChannel.MASTER, Mute.ON, new Callback0() {
 	            @Override
 	            public void success() {
@@ -88,7 +81,7 @@ public class PlayerSonos extends AbstractPlayer {
 	            }
 	        });			
 		}
-		muted = flag;
+		muted = flag;*/
 	}
 	
 	public boolean getMute() {

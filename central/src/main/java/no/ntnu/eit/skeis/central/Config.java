@@ -21,14 +21,13 @@ abstract public class Config {
 	 * Static mapping between wifi ips and bluetooth mac addresses
 	 */
 	public static final Map<String, String> ipBMacMapping = new HashMap<String, String>();
+
+	public static final Map<String, String> deviceAliases = new HashMap<String, String>();
 	
+	/**
+	 * Number of media renderer endpoints to expose
+	 */
 	public static final int NUM_MEDIA_RENDERERS = 2;
-	
-	
-	static {
-		ipBMacMapping.put("192.168.0.105", "f8:db:7f:04:a0:71");
-		ipBMacMapping.put("192.168.0.124", "a8:26:d9:f2:dc:27");
-	}
 	
 
 	/**
@@ -54,7 +53,7 @@ abstract public class Config {
 		if(sensorNValues.containsKey(sensor)) {
 			return sensorNValues.get(sensor);
 		}
-		Logger.getLogger(Config.class.getName()).info("Missing N value for sensor "+sensor+"!");
+		//Logger.getLogger(Config.class.getName()).info("Missing N value for sensor "+sensor+"!");
 		return 0.2;
 	}
 	
@@ -74,10 +73,10 @@ abstract public class Config {
 			if(map.containsKey(sensor)) {
 				return map.get(sensor);
 			}
-			Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+" for sensor "+sensor+"!");
+			//Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+" for sensor "+sensor+"!");
 			return 45;
 		}
-		Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+"!");
+		//Logger.getLogger(Config.class.getName()).info("Missing A value for device "+device+"!");
 		return 45;
 	}
 }

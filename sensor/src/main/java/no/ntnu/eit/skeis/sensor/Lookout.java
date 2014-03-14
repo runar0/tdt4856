@@ -23,14 +23,12 @@ public class Lookout {
 	class ConnectionInfo {
 		public final InetAddress address;
 		public final int sensor_port;
-		public final int player_port;
-		public ConnectionInfo(InetAddress address, int sensor_port, int player_port) {
+		public ConnectionInfo(InetAddress address, int sensor_port) {
 			this.address = address;
 			this.sensor_port = sensor_port;
-			this.player_port = player_port;
 		}
 		public String toString() {
-			return address.getHostAddress()+" (sensor: "+sensor_port+"/TCP, player: "+player_port+"/TCP)";
+			return address.getHostAddress()+" (sensor: "+sensor_port+"/TCP)";
 		}
 	}
 	
@@ -56,7 +54,7 @@ public class Lookout {
 			
 			CentralBeacon beacon = CentralBeacon.parseDelimitedFrom(new ByteArrayInputStream(buffer));
 			
-			return new ConnectionInfo(packet.getAddress(), beacon.getSensorPort(), beacon.getPlayerPort());			
+			return new ConnectionInfo(packet.getAddress(), beacon.getSensorPort());			
 		} catch(IOException e) {
 		} finally {
 			if(socket != null) {
