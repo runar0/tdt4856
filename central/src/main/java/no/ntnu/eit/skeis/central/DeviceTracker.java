@@ -222,7 +222,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 		devicesChanged = true;
 		
 		// If we got an old closest sensor we need to de-register
-		if(old_alias != null) {
+		if(old_alias != null && sensorRegistrations.containsKey(old_alias)) {
 			Iterator<DeviceSensorEntry> it = sensorRegistrations.get(old_alias).iterator();
 			while(it.hasNext()) {
 				DeviceSensorEntry entry = it.next();
