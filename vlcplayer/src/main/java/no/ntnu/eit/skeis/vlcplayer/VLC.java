@@ -20,7 +20,7 @@ public class VLC {
 	 */
 	private final Process vlc;
 	
-	private final String VLC_URL = "http://0.0.0.0:8080/requests/status.xml";
+	private final String VLC_URL = "http://0.0.0.0:12358/requests/status.xml";
 	
 	/**
 	 * Last playback URL set.
@@ -51,7 +51,7 @@ public class VLC {
 		
 		Process vlc = null;
 		try {
-			vlc = Runtime.getRuntime().exec("vlc -I http --http-password 1234");
+			vlc = Runtime.getRuntime().exec("vlc -I http --http-port 12358 --http-password 1234");
 		} catch(IOException e) {			
 			// At this point there is no need to run, so we can just kill it here
 			System.err.println("UNABLE TO START VLC!");

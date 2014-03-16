@@ -2,9 +2,6 @@ package no.ntnu.eit.skeis.central;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Logger;
-
-import sun.rmi.runtime.Log;
 
 /**
  * This class contains all hard-coded configuration which is needed for a successful
@@ -38,6 +35,7 @@ abstract public class Config {
 	static {
 		upnpAliases.put("RINCON_B8E93758042E01400", "sonos1");
 		upnpAliases.put("RINCON_B8E937581CDC01400", "sonos2");
+		upnpAliases.put("9c0f12f7-366e-c57b-0000-000005ff505c", "vlc");
 	}
 	
 	/**

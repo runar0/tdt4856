@@ -88,14 +88,14 @@ public class PlayerUPNP extends AbstractPlayer {
 		log = Logger.getLogger(getClass().getName());
 	}
 	
+	private String url;
+	
 	/**
 	 * Set playback url
 	 */
 	@Override
 	public void setUrl(String url) {
-		upnp.getControlPoint().execute(
-			new DefaultActionCallback(new SetUrlActionInvocation(service, url), log)
-		);
+		this.url = url;
 	}
 
 	/**
@@ -103,13 +103,19 @@ public class PlayerUPNP extends AbstractPlayer {
 	 */
 	@Override
 	public void setPlayState(boolean play) {
-		ActionInvocation<RemoteService> action;
 		if(play) {
-			action = new PlayActionInvocation(service);
+			upnp.getControlPoint().execute(
+				new DefaultActionCallback(new SetUrlActionInvocation(service, url), log) {
+					@Override
+					public void success(ActionInvocation invocation) {
+						super.success(invocation);
+						upnp.getControlPoint().execute(new DefaultActionCallback(new PlayActionInvocation(service), log));
+					}
+				}
+			);
 		} else {
-			action = new StopActionInvocation(service);
+			upnp.getControlPoint().execute(new DefaultActionCallback(new StopActionInvocation(service), log));
 		}
-		upnp.getControlPoint().execute(new DefaultActionCallback(action, log));
 	}
 
 	@Override
@@ -124,7 +130,7 @@ public class PlayerUPNP extends AbstractPlayer {
 	protected void playAudioSource(AudioSource source) {
 		setUrl(source.getHttpUrl());
 		setPlayState(true);
-		setVolume(50);
+		//setVolume(50);
 	}
 
 	@Override
