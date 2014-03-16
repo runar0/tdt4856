@@ -33,26 +33,33 @@ public class Central {
 	public Central() throws Exception {
 		log = Logger.getLogger(getClass().getName());
 		
+		// Basic managers
 		sensor_manager = new SensorManager();		
-		player_manager = new PlayerManager(this);		
-		tracker = new DeviceTracker(this);		
+		player_manager = new PlayerManager();
+		
+		// Device tracker that combines all our data
+		tracker = new DeviceTracker(this);	
+		
+		// JSON API server
+		api_server = new ApiServer(12355);
+		api_server.setDaemon(true);
+		api_server.start();
+		
+		// Device socket for sensors and primitive TCP players
 		deviceServerSocket = new DeviceServerSocket(this);
 		deviceServerSocket.startServer(12354);
 		
-		// Start API server
-		api_server = new ApiServer(12355);
-		api_server.start();
 		
-		// Start Beacon server
+		// Start Beacon server, this will enable phones and sensors to autodetect the central
 		beacon = new Beacon(deviceServerSocket, api_server);
 		beacon.start();
 		
 		// Start UPNP control point
-
 		final UpnpService upnp = new UpnpServiceImpl();
 		upnpDeviceServer = new UPNPDeviceServer(this, upnp);
 		upnpDeviceServer.start();
 		
+		// Finally register a shutdown hook that ensures a clean shutdown
 		Runtime.getRuntime().addShutdownHook(new Thread() {
 			@Override
 			public void run() {

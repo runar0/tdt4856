@@ -51,13 +51,6 @@ public interface PlayerInterface {
 	 * 
 	 * @param device
 	 */
-	public abstract void registerDevice(Device device);
-
-	/**
-	 * Unregister a previously registered device
-	 * 
-	 * @param device
-	 */
-	public abstract void unregisterDevice(Device device);
+	public abstract void setControllingDevice(Device device);
 
 }

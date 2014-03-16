@@ -25,7 +25,7 @@ public class Device {
 		 * @param device
 		 * @param sensor_alias
 		 */
-		public void onDeviceClosestSensor(Device device, String sensor_alias);
+		public void onDeviceClosestSensor(Device device, String old_sensor_alias, String new_sensor_alias);
 		
 		/**
 		 * Called when the active status of a player changes
@@ -70,7 +70,7 @@ public class Device {
 	/**
 	 * 'Infinity', any distance larger than this will be ignored
 	 */
-	private static final double INFINITY = 500;
+	private static final double INFINITY = 50;
 	
 	/**
 	 * PlayerConnection this device is related to
@@ -116,18 +116,13 @@ public class Device {
 	 * @param sensorAliases
 	 * @param listener
 	 */
-	public Device(String mac, Set<String> sensorAliases, DeviceListener listener) {
+	public Device(String mac, DeviceListener listener) {
 		this.log = Logger.getLogger(getClass().getName());
 		this.mac = mac;
 		this.listener = listener;
 		readings = new HashMap<String, SensorReading>();
 		last_update = System.currentTimeMillis();
-		
-		// Emulate a attach event for all already attached sensors
-		for(String s : sensorAliases) {
-			onSensorAttach(s);
-		}
-		
+				
 		// TODO This is just for testing
 		/*if(mac.toLowerCase().startsWith("a8:26:d9")) {
 			audio_source = new AudioSource() {
@@ -243,7 +238,9 @@ public class Device {
 				alias = sensor;
 			}
 		}
-		listener.onDeviceClosestSensor(this, alias);
+		String old_alias = closest_sensor;
+		closest_sensor = alias;
+		listener.onDeviceClosestSensor(this, old_alias, alias);
 	}
 	
 	/**
