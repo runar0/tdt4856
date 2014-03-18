@@ -1,38 +1,27 @@
 #!/bin/bash
 
-apt-get update
-#apt-get upgrade -y
-apt-get install build-essential openjdk-7-jdk ant bluez bluez-hcidump -y
+if [ ! -f "/root/vagrant-updated" ]; then
+	apt-get update
+	#apt-get upgrade -y
+	apt-get install openjdk-7-jdk bluez bluez-hcidump -y
+	touch /root/vagrant-updated
+fi
 
 export JAVA_HOME=/usr/lib/jvm/java-7-openjdk-i386/jre
 export PATH=/usr/lib/jvm/java-7-openjdk-i386/jre/bin:$PATH
-
-# Compile and install newest version of protobuf
-which protoc
-if [ "$?" -ne "0" ]; then
-    cd ~
-    wget https://protobuf.googlecode.com/files/protobuf-2.5.0.tar.bz2
-    tar xvf protobuf-2.5.0.tar.bz2
-    cd protobuf-2.5.0
-    ./configure --prefix=/usr
-    make && make install
-    cd ~
- fi
 
 # Test for hci0
 hciconfig hci0 up
 if [ "$?" -ne "0" ]; then
     echo ""
     echo "Unable to bring bluetooth up, is USB filter configured?"
-    exit 1
 fi
 
-# Build our project
-cd /source
-#make
+# Download sensor jar
+if [ ! -f "sensor.jar" ]; then
+	wget https://github.com/Runar0/tdt4856/releases/download/0.0.1/sensor.jar
+fi
 
-# Execute sensor app
-cd /source/dist
-#source /vagrant/settings.sh
-java -jar sensor.jar sonos2
+source /vagrant/settings.sh
+java -jar sensor.jar $SENSOR_ALIAS
 
