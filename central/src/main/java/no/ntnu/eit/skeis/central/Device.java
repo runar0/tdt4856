@@ -38,7 +38,7 @@ public class Device {
 	 * 
 	 * @author Runar B. Olsen <runar.b.olsen@gmail.com>
 	 */
-	private class SensorReading {
+	public class SensorReading {
 		private double distance = INFINITY;
 		private long timestamp = System.currentTimeMillis();
 		

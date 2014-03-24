@@ -6,10 +6,18 @@ import java.io.InputStreamReader;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.SortedSet;
 import java.util.logging.Logger;
 
+import no.ntnu.eit.skeis.central.Central;
 import no.ntnu.eit.skeis.central.Config;
+import no.ntnu.eit.skeis.central.Device;
+import no.ntnu.eit.skeis.central.DeviceTracker.DeviceSensorEntry;
+
+import com.google.gson.Gson;
 
 /**
  * JSON API server
@@ -21,9 +29,13 @@ public class ApiServer extends Thread {
 	private boolean running;	
 	private int port;	
 	private Logger log;
+	private final Central central;
+	private final Gson gson;
 	
-	public ApiServer(int port) {
+	public ApiServer(int port, Central central) {
+		this.gson = new Gson();
 		running = true;
+		this.central = central;
 		this.port = port;
 		log = Logger.getLogger(getClass().getName());
 	}
@@ -41,6 +53,7 @@ public class ApiServer extends Thread {
 		ServerSocket server = null;
 		try {
 			server = new ServerSocket(getPort());
+			log.info("API server serving requests at "+getPort()+"/TCP");
 		} catch(IOException ioe) {
 			ioe.printStackTrace();
 			System.exit(1);
@@ -78,7 +91,15 @@ public class ApiServer extends Thread {
 						);
 					} else if(params.get("action").equals("status")) {
 						socket.getOutputStream().write("{ \"status\": 1}\r\n".getBytes());
-					}
+					} else if(params.get("action").equals("sensor-queues")) {
+						socket.getOutputStream().write(
+							handleSensorQueues().getBytes()
+						);
+					} else if(params.get("action").equals("device-readings")) {
+						socket.getOutputStream().write(
+								handleDeviceReadings(params.get("mac")).getBytes()
+							);
+						}
 				}
 				
 			} catch(IOException e) {
@@ -89,6 +110,47 @@ public class ApiServer extends Thread {
 				}
 			}
 		}
+	}
+	
+	private String handleDeviceReadings(String mac) {
+		Device device = central.getDeviceTracker().getDevice(mac);
+		if(device == null) {
+			return "{\"error\": \"Unknown device\"}";
+		}
+		Map<String, Double> readings = new HashMap<String, Double>();
+		for(String sensor : central.getSensorManager().getSensorAliases()) {
+			readings.put(sensor, device.getLastReading(sensor));
+		}
+		return gson.toJson(readings);
+	}
+
+	class SensorQueueEntry {
+		public long timestamp = 0;
+		public int priority = 0;
+		public String device;
+		public SensorQueueEntry(DeviceSensorEntry d) {
+			timestamp = d.timestamp;
+			priority = d.priority;
+			device = d.device.toString();
+		}
+	}
+
+	/**
+	 * Return a list of all sensor queues
+	 * 
+	 * @return
+	 */
+	private String handleSensorQueues() {
+		Map<String, SortedSet<DeviceSensorEntry>> queues = central.getDeviceTracker().getSensorRegistrations();
+		
+		Map<String, List<SensorQueueEntry>> simplified = new HashMap<String, List<SensorQueueEntry>>();
+		for(String sensor : queues.keySet()) {
+			simplified.put(sensor, new LinkedList<SensorQueueEntry>());
+			for(DeviceSensorEntry entry : queues.get(sensor)) {
+				simplified.get(sensor).add(new SensorQueueEntry(entry));
+			}
+		}		
+		return gson.toJson(simplified);
 	}
 
 	/**

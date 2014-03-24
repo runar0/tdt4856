@@ -41,7 +41,7 @@ public class Central {
 		tracker = new DeviceTracker(this);	
 		
 		// JSON API server
-		api_server = new ApiServer(12355);
+		api_server = new ApiServer(12355, this);
 		api_server.setDaemon(true);
 		api_server.start();
 		

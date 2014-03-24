@@ -54,7 +54,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 		 * They are ordered by three rules:
 		 *  1 - If one is active, it is considered to be less than the other
 		 *  2 - If one has higher priority than an other, it is considered to be lesser
-		 *  3 - If all else fails the entry time stamps is used, here the oldes one is the lesser one
+		 *  3 - If all else fails the entry time stamps is used, here the oldest one is the lesser one
 		 */
 		@Override
 		public int compareTo(DeviceSensorEntry other) {
@@ -167,6 +167,10 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 		
 	}
 
+	public Map<String, SortedSet<DeviceSensorEntry>> getSensorRegistrations() {
+		return sensorRegistrations;
+	}
+	
 	/**
 	 * A new sensor has connected to the system
 	 */
