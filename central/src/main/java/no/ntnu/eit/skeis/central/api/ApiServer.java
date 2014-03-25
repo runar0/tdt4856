@@ -130,10 +130,12 @@ public class ApiServer extends Thread {
 	class SensorQueueEntry {
 		public long timestamp = 0;
 		public int priority = 0;
+		public boolean active = false;
 		public String device;
 		public SensorQueueEntry(DeviceSensorEntry d) {
 			timestamp = d.timestamp;
 			priority = d.priority;
+			active = d.device.isActive();
 			device = d.device.toString();
 		}
 	}
