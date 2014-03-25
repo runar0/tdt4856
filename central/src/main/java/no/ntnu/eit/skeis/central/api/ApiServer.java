@@ -60,54 +60,57 @@ public class ApiServer extends Thread {
 		}
 		
 		while(running) {
-			Socket socket = null;
 			try {
-				socket = server.accept();
+				final Socket socket = server.accept();
 				
-				BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-				String s;
-				Map<String, String> params = null;
-				while((s = in.readLine()) != null) {
-					if(s.startsWith("GET /?")) {
-						params = decodeUri(s.substring(6, s.lastIndexOf(' ')));
-					}
-					if(s.trim().equals("")) {
-						break;
-					}
-				}
-				
-				// Write response header, we always succeed and handle any errors in the json
-				socket.getOutputStream().write((
-					"HTTP/1.1 OK\r\n"+
-					"Content-Type: application/json\r\n"+
-					"Connection: close\r\n"+
-					"\r\n"
-				).getBytes());
-				
-				if(params != null && params.containsKey("action")) {
-					if(params.get("action").equals("mapDevice")) {
-						socket.getOutputStream().write(
-							handleMapDevice(params.get("mac"), socket.getInetAddress().getHostAddress(), params.get("alias")).getBytes()
-						);
-					} else if(params.get("action").equals("status")) {
-						socket.getOutputStream().write("{ \"status\": 1}\r\n".getBytes());
-					} else if(params.get("action").equals("sensor-queues")) {
-						socket.getOutputStream().write(
-							handleSensorQueues().getBytes()
-						);
-					} else if(params.get("action").equals("device-readings")) {
-						socket.getOutputStream().write(
-								handleDeviceReadings(params.get("mac")).getBytes()
-							);
-						}
-				}
-				
+				Thread handler = new Thread() {
+					public void run() {
+						try {
+							BufferedReader in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+							String s;
+							Map<String, String> params = null;
+							while((s = in.readLine()) != null) {
+								if(s.startsWith("GET /?")) {
+									params = decodeUri(s.substring(6, s.lastIndexOf(' ')));
+								}
+								if(s.trim().equals("")) {
+									break;
+								}
+							}
+							
+							// Write response header, we always succeed and handle any errors in the json
+							socket.getOutputStream().write((
+								"HTTP/1.1 OK\r\n"+
+								"Content-Type: application/json\r\n"+
+								"Connection: close\r\n"+
+								"\r\n"
+							).getBytes());
+							
+							if(params != null && params.containsKey("action")) {
+								if(params.get("action").equals("mapDevice")) {
+									socket.getOutputStream().write(
+										handleMapDevice(params.get("mac"), socket.getInetAddress().getHostAddress(), params.get("alias")).getBytes()
+									);
+								} else if(params.get("action").equals("status")) {
+									socket.getOutputStream().write("{ \"status\": 1}\r\n".getBytes());
+								} else if(params.get("action").equals("sensor-queues")) {
+									socket.getOutputStream().write(
+										handleSensorQueues().getBytes()
+									);
+								} else if(params.get("action").equals("device-readings")) {
+									socket.getOutputStream().write(
+										handleDeviceReadings(params.get("mac")).getBytes()
+									);
+								}
+							}
+							socket.close();
+						} catch(Exception e) {}
+					};
+				};
+				handler.setDaemon(true);
+				handler.start();
 			} catch(IOException e) {
 				e.printStackTrace();
-			} finally {
-				if(socket != null) { 
-					try { socket.close(); } catch(IOException e) {}
-				}
 			}
 		}
 	}
