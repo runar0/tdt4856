@@ -34,6 +34,30 @@
 		<!--[if lt IE 9]>
 		<script src="lib/js/html5shiv.js"></script>
 		<![endif]-->
+
+		<style type="text/css">
+			ul.sensors {
+				list-style: none;
+			}
+
+			ul.sensors > li {
+				list-style: none;
+				display: block;
+				width:50%;
+				float: left;
+			}
+
+			ul.sensor li ul {
+				clear:both;
+			}
+
+			ul.sensors li.name {
+				font-weight: bold;
+				text-decoration: underline;
+				font-size: 1.2em;
+				padding-bottom: 10px;
+			}
+		</style>
 	</head>
 
 	<body>
@@ -97,6 +121,7 @@
 		<script type="text/jsx">
 		/** @jsx React.DOM */	
 
+		// Are we ready to go widget
 		var CentralStatus = React.createClass({
 			componentWillMount: function() {
 				$.ajax({
@@ -123,9 +148,72 @@
 			}
 		});
 
-		Reveal.addEventListener('query-server-status', function() {
+		/*Reveal.addEventListener('query-server-status', function() {
 			React.renderComponent(
 				<CentralStatus url="http://0.0.0.0:12355/?action=status" />,
+				document.getElementById('central-status-indicator')
+			);	
+		});*/
+
+		// A signle sensor entry
+		var SensorQueue = React.createClass({
+			render: function() {
+				var registrations = this.props.queue.map(function(entry) {
+					return (<li>{entry.device}</li>)
+				});
+				return (
+					<li>
+						<ul>
+							<li className="name">{this.props.name}</li>
+							{registrations}
+						</ul>
+					</li>
+				);
+			}
+		});
+
+		// Sensor table
+		var SensorTable = React.createClass({
+			loadSensorDataFromServer: function (){
+				$.ajax({
+					url: "http://0.0.0.0:12355/?action=sensor-queues",
+					dataType: 'json',
+					success: function(data) {
+						this.setState({data: data});
+					}.bind(this),
+					error: function(xhr, status, err) {
+						this.setState({data: null});
+					}.bind(this)
+				});
+			},
+
+			componentWillMount: function() {
+				this.setState({data: {}});
+				this.loadSensorDataFromServer();
+    			setInterval(this.loadSensorDataFromServer, 2000);
+			},
+			render: function() {
+				var sensorQueue = function(name, queue) {
+					return (
+						<SensorQueue name={name} queue={queue} />
+					);
+				}
+
+				var data = [];
+				for(var sensor in this.state.data) {
+					data.push(sensorQueue(sensor, this.state.data[sensor]));
+				}
+				return (
+					<ul className="sensors">
+						{data}
+					</ul>
+				);
+			}
+		});
+
+		Reveal.addEventListener('query-server-status', function() {
+			React.renderComponent(
+				<SensorTable/>,
 				document.getElementById('central-status-indicator')
 			);	
 		});
