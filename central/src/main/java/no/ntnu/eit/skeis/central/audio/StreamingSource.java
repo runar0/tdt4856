@@ -84,6 +84,8 @@ public class StreamingSource implements AudioSource {
 			} catch(IOException e) {
 				// Socket closed most likely
 			}
+			// Not really drained, but if we cannot accept clients we might as well be
+			drained = true;
 		}
 	}
 	
@@ -101,8 +103,11 @@ public class StreamingSource implements AudioSource {
 				drained = false;
 				log.info("Starting stream drain");
 				while((frame = Frame.fromInputStream(in)) != null) {
-					frameBuffer.add(frame);
-					totalFrames++;
+					synchronized(frameBuffer) {
+						frameBuffer.add(frame);
+						totalFrames++;
+						frameBuffer.notifyAll();
+					}
 				}
 				drained = true;
 				log.info("Drained stream");
@@ -136,18 +141,26 @@ public class StreamingSource implements AudioSource {
 			long time = -1;
 			
 			while(true) {
-				try {
-					frame = frameBuffer.get(currentFrame);
-				} catch(IndexOutOfBoundsException e) {
-					// If we're catching up delay for a bit and keep going
-					if (!drained) {
-						log.info("Client underrun, pausing "+currentFrame + " of "+totalFrames);
-						for(int i = 0; i < 20; i++) { try { Thread.sleep(100); } catch(Exception ex) {} }
-						continue;
+				synchronized(frameBuffer) {
+					try {
+						frame = frameBuffer.get(currentFrame);
+					} catch(IndexOutOfBoundsException e) {
+						// If we're catching up delay for a bit and keep going
+						if (!drained) {
+							log.info("Client underrun, pausing "+currentFrame + " of "+totalFrames);
+							try {
+								// Wait for buffer to fill, then wait for an other second
+								System.out.println("Wait");
+								frameBuffer.wait();
+								Thread.sleep(1000);
+								System.err.println("Wake");
+							} catch (InterruptedException e1) {/* dont care */ }
+							continue;
+						}
+						// If we're drained we kill the thread
+						log.info("Client feeder buffer underrun!");
+						break;
 					}
-					// If we're drained we kill the thread
-					log.info("Client feeder buffer underrun!");
-					break;
 				}
 				
 				synchronized(clients) {
@@ -187,15 +200,11 @@ public class StreamingSource implements AudioSource {
 				while(it.hasNext()) {
 					try {
 						it.next().close();
+						it.remove();
 					} catch(Exception e) {
 						// ignore
 					}
 				}
-			}
-			
-			// If we've reached the end, unregister ourselves with the device
-			if(frameBuffer.size() == 0) {
-				device.setAudioSource(null);
 			}
 		}
 	}
@@ -303,25 +312,5 @@ public class StreamingSource implements AudioSource {
 		);
 		
 	}
-	
-	public static void main(String[] args) throws Exception  {
-		
-		FileInputStream inputStream = new FileInputStream("8.mp3");
-		Converter c = new Converter();
-		c.convert(inputStream, "out.wav", null, null);
-		
-	}
-	
-	static short[] concatArrays(short[] A, short[] B) {
-
-        int aLen = A.length;
-        int bLen = B.length;
-        short[] C= new short[aLen+bLen];
-
-        System.arraycopy(A, 0, C, 0, aLen);
-        System.arraycopy(B, 0, C, aLen, bLen);
-
-        return C;
-    }
 	
 }

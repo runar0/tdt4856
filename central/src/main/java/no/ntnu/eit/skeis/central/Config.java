@@ -69,8 +69,8 @@ abstract public class Config {
 	public static Map<String, Map<String, Double>> deviceSensorAValue = new HashMap<String, Map<String, Double>>();
 	
 	static {
-		deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
-		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("runar", 45.0);
+		//deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
+		//deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("runar", 45.0);
 	}
 	
 	public static double getClientAValue(String sensor, String device) {
