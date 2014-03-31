@@ -2,7 +2,6 @@ package no.ntnu.eit.skeis.central;
 
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Set;
 import java.util.logging.Logger;
 
 import no.ntnu.eit.skeis.central.audio.AudioSource;
@@ -52,7 +51,7 @@ public class Device {
 			if(this.distance >= INFINITY) {
 				this.distance = distance;
 			} else {
-				this.distance = (1-Config.SENSOR_READING_COEFF)*this.distance + (Config.SENSOR_READING_COEFF)*distance;
+				this.distance = this.distance + Config.SENSOR_READING_COEFF * (distance - this.distance);
 			}
 			timestamp = System.currentTimeMillis();
 		}

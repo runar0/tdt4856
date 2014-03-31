@@ -12,7 +12,7 @@ import java.util.Map;
  */
 abstract public class Config {
 
-	public static final double SENSOR_READING_COEFF = 0.8;
+	public static final double SENSOR_READING_COEFF = 0.15;
 	
 	/**
 	 * Static mapping between wifi ips and bluetooth mac addresses
