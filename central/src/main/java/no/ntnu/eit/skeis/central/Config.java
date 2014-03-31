@@ -35,7 +35,15 @@ abstract public class Config {
 	static {
 		upnpAliases.put("RINCON_B8E93758042E01400", "sonos1");
 		upnpAliases.put("RINCON_B8E937581CDC01400", "sonos2");
-		upnpAliases.put("9c0f12f7-366e-c57b-0000-000005ff505c", "vlc");
+		
+		ipBMacMapping.put("192.168.1.201", "f8:db:7f:04:a0:71");
+		deviceAliases.put("f8:db:7f:04:a0:71", "htc-desire");
+
+		ipBMacMapping.put("192.168.1.200", "a8:26:d9:f2:dc:27");
+		deviceAliases.put("a8:26:d9:f2:dc:27", "htc-one");
+		
+		ipBMacMapping.put("192.168.1.202", "cc:fa:00:58:03:81");
+		deviceAliases.put("cc:fa:00:58:03:81", "nexus5");
 	}
 	
 	/**
@@ -61,8 +69,8 @@ abstract public class Config {
 	public static Map<String, Map<String, Double>> deviceSensorAValue = new HashMap<String, Map<String, Double>>();
 	
 	static {
-		deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
-		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("runar", 45.0);
+		//deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
+		//deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("runar", 45.0);
 	}
 	
 	public static double getClientAValue(String sensor, String device) {

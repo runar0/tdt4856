@@ -39,6 +39,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	private MediaInfo mediaInfo = new MediaInfo();
 	private PositionInfo positionInfo = new PositionInfo();
 	private TransportInfo transportInfo = new TransportInfo(TransportState.STOPPED);
+	
+	private boolean hasNewUrl = true;
 		
 	public CentralAVTransportService(CentralMediaRenderer mediarenderer, int instance) {
 		log = Logger.getLogger(getClass().getName());
@@ -60,7 +62,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	 * Create stream server 
 	 */
 	private void createStreamServer() {
-		killStreamServer();
+		if(hasNewUrl)
+			killStreamServer();
 		
 		if (currentURI == null || getDevice() == null) {
 			log.info(instance+ ": Did not start streaming server, either no URI or (probably) no device found!");
@@ -94,6 +97,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 						}
 					}
 					if (b == -1) {
+						socket.close();
 						throw new IOException("EOF");
 					}
 					
@@ -113,6 +117,7 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	 * Kill stream server if it is running
 	 */
 	private void killStreamServer() {
+		hasNewUrl = true;
 		StreamingSource streamingServer = mediarenderer.getStreamingServer(instance);
 		if(streamingServer != null) {
 			log.info(instance + ": Attempting to kill stream");
@@ -153,7 +158,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			new AVTransportVariable.AVTransportURI(this.currentURI)
 		);
 		
-		System.out.println(instance+": setAVTransportURI "+currentURI + " meta: "+currentURIMetaData);		
+		System.out.println(instance+": setAVTransportURI "+currentURI + " meta: "+currentURIMetaData);	
+		hasNewUrl = true;
 	}
 	
 	@Override
@@ -195,7 +201,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 	@Override
 	public void stop(UnsignedIntegerFourBytes instanceId)
 			throws AVTransportException {
-
+		
+		hasNewUrl = true;
 		System.out.println(instance+ ": Stop");		
 		killStreamServer();
 		

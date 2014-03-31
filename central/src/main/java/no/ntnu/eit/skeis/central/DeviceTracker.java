@@ -142,13 +142,17 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 								
 									// If the queue is empty, or the top one is not active we clear player control
 									if(entry == null || !entry.device.isActive()) {
-										System.out.println("Clearing control of player "+sensor);
-										player.setControllingDevice(null); 
+										if(player.getControllingDevice() != null) {
+											System.out.println("Clearing control of player "+sensor);
+											player.setControllingDevice(null); 
+										}
 									} 
 									// Otherwise we update player control
 									else {
-										System.out.println(entry + " should control "+sensor);										
-										player.setControllingDevice(entry.device);
+										if(player.getControllingDevice() == null || !player.getControllingDevice().equals(entry.device)) {
+											System.out.println(entry + " should control "+sensor);										
+											player.setControllingDevice(entry.device);
+										}
 									}
 								}
 							}
@@ -157,7 +161,7 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 						}
 						
 						//System.out.println(that);
-						Thread.sleep(500);
+						Thread.sleep(250);
 					} catch(InterruptedException e) {}
 				}
 			};

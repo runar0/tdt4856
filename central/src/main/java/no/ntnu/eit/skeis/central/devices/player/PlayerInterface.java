@@ -52,5 +52,12 @@ public interface PlayerInterface {
 	 * @param device
 	 */
 	public abstract void setControllingDevice(Device device);
+	
+	/**
+	 * Get device currently controlling the player, or null
+	 * 
+	 * @return
+	 */
+	public abstract Device getControllingDevice();
 
 }

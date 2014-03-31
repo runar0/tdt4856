@@ -15,7 +15,7 @@ import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
  * 
  * @author Runar B. Olsen <runar.b.olsen@gmail.com>
  */
-public class Device {
+public class Device implements Comparable<Device> {
 
 	public interface DeviceListener {
 		/**
@@ -212,7 +212,7 @@ public class Device {
 		reading.updateDistance(distance);
 				
 		// Check if we got a new closest sensor 
-		updateClosestSensor();
+		//updateClosestSensor();
 	}
 	
 	/**
@@ -299,5 +299,10 @@ public class Device {
 		}
 		audio_source = audio;
 		listener.onActiveStatusChange(this, closest_sensor);
+	}
+
+	@Override
+	public int compareTo(Device that) {
+		return this.mac.compareTo(that.mac);
 	}
 }
