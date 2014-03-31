@@ -4,6 +4,7 @@ import no.ntnu.eit.skeis.central.audio.AudioSource;
 import no.ntnu.eit.skeis.central.devices.PlayerManager;
 import de.kalass.sonoscontrol.api.control.SonosDevice;
 import de.kalass.sonoscontrol.api.core.Callback0;
+import de.kalass.sonoscontrol.api.core.Callback1;
 import de.kalass.sonoscontrol.api.model.avtransport.AVTransportURI;
 import de.kalass.sonoscontrol.api.model.renderingcontrol.Channel;
 import de.kalass.sonoscontrol.api.model.renderingcontrol.Mute;
@@ -35,6 +36,7 @@ public class PlayerSonos extends AbstractPlayer {
 			transport.setAVTransportURI(AVTransportURI.getInstance(this.url), null, new Callback0() {
                 @Override
                 public void success() {
+                	System.out.println("URL SET PLAYING!");
                 	transport.play(null);
                 }
             });

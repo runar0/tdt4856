@@ -16,7 +16,7 @@ import no.ntnu.eit.skeis.central.devices.player.PlayerInterface;
  * 
  * @author Runar B. Olsen <runar.b.olsen@gmail.com>
  */
-public class Device {
+public class Device implements Comparable<Device> {
 
 	public interface DeviceListener {
 		/**
@@ -52,7 +52,7 @@ public class Device {
 			if(this.distance >= INFINITY) {
 				this.distance = distance;
 			} else {
-				this.distance = (1-Config.SENSOR_READING_COEFF)*this.distance + (Config.SENSOR_READING_COEFF)*distance;
+				this.distance = this.distance + Config.SENSOR_READING_COEFF*(distance - this.distance);
 			}
 			timestamp = System.currentTimeMillis();
 		}
@@ -213,7 +213,7 @@ public class Device {
 		reading.updateDistance(distance);
 				
 		// Check if we got a new closest sensor 
-		updateClosestSensor();
+		//updateClosestSensor();
 	}
 	
 	/**
@@ -300,5 +300,10 @@ public class Device {
 		}
 		audio_source = audio;
 		listener.onActiveStatusChange(this, closest_sensor);
+	}
+
+	@Override
+	public int compareTo(Device that) {
+		return this.mac.compareTo(that.mac);
 	}
 }

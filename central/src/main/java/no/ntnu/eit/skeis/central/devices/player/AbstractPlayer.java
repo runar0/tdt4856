@@ -56,6 +56,11 @@ abstract public class AbstractPlayer implements PlayerInterface {
 		}
 	}
 	
+	@Override
+	public Device getControllingDevice() {
+		return active_device;
+	}
+	
 	/**
 	 * Start playback of the given audio source object
 	 * 
