@@ -212,7 +212,7 @@ public class Device implements Comparable<Device> {
 		reading.updateDistance(distance);
 				
 		// Check if we got a new closest sensor 
-		//updateClosestSensor();
+		updateClosestSensor();
 	}
 	
 	/**

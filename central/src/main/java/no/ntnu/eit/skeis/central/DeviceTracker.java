@@ -122,9 +122,9 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 				while(true) {
 					try {
 						// Have all devices update their state
-						/*for(Device d : devices.values()) {
-							d.updateClosestSensor();
-						}*/
+						//for(Device d : devices.values()) {
+						//	d.updateClosestSensor();
+						//}
 						
 						if(devicesChanged) {
 							Iterator<String> it = sensorRegistrations.keySet().iterator();
