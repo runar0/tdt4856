@@ -15,7 +15,7 @@
 		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 
 		<link rel="stylesheet" href="css/reveal.min.css">
-		<link rel="stylesheet" href="css/theme/default.css" id="theme">
+		<!--<link rel="stylesheet" href="css/theme/default.css" id="theme">-->
 
 		<!-- For syntax highlighting -->
 		<link rel="stylesheet" href="lib/css/zenburn.css">
@@ -36,28 +36,11 @@
 		<![endif]-->
 
 		<style type="text/css">
-			ul.sensors {
-				list-style: none;
-			}
-
-			ul.sensors > li {
-				list-style: none;
-				display: block;
-				width:50%;
-				float: left;
-			}
-
-			ul.sensor li ul {
-				clear:both;
-			}
-
-			ul.sensors li.name {
-				font-weight: bold;
-				text-decoration: underline;
-				font-size: 1.2em;
-				padding-bottom: 10px;
-			}
+			
 		</style>
+		
+		
+		<link rel="stylesheet" href="css/theme/skeis.css" id="theme">
 	</head>
 
 	<body>
@@ -66,16 +49,67 @@
 
 			<!-- Any section element inside of this container is displayed as a slide -->
 			<div class="slides">
-				<section>
-					<h1>TRACKbox</h1>
-					<h3>Prototype</h3>
+				<section class="only-header">
+					<h1>TRACKbox <br><small>Prototype</small></h1>
 				</section>
 
 				<section data-state="query-server-status">
-					<h1>Ready?</h1>
+					<h1>KLAR?</h1>
 
 					<div id="central-status-indicator"></div>
 				</section>
+				
+				<section>
+					<h1>OPPSETT</h1>
+					<ul>
+						<li>Sensorer</li>
+						<li>Høytalere</li>
+						<li>Sentralenhet</li>
+						<li>Lydkilder</li>
+					</ul>
+				</section>
+
+				<section>
+					<h1>SENSOR</h1>
+					<ul>
+						<li>Bluetooth skann</li>
+						<li>Signalstyrke målinger (RSSI)</li>
+						<li>Omregning til distanse</li>
+						<li>Nødvendigheten av nøyaktige målinger</li>
+					</ul>
+					<small>Legg til avstandsmålinger for en mobil her, (S1---|------S2)</small>
+				</section>
+
+				<section data-state="start-sensor-queue">
+					<h1>FLERE SENSORER</h1>
+					<ul>
+						<li>'Nærmeste sensor'</li>
+						<li>Prioriteringer
+						</li>
+					</ul>
+
+					<div id="central-sensor-queue"></div>
+				</section>
+
+				<section>
+					<h1>AVSPILLERE</h1>
+
+					<ul>
+						<li>DLNA</li>
+						<li>SONOS</li>
+						<li>Avspiller-Sensor kobling</li>
+					</ul>
+				</section>
+
+				<section>
+					<h1>SENTRALENHET</h1>
+
+					<img src="arch.png" alt="System architecture" />
+				</section>
+
+				<section class="only-header">
+					<h1>DEMO <br><small>Fingers crossed</small></h1>
+				</section>	
 
 			</div>
 
@@ -97,9 +131,13 @@
 				progress: true,
 				history: true,
 				center: true,
+				margin: 0,
+				width: 720, 
+				height: 540,
+				maxScale: 4,
 
 				theme: Reveal.getQueryHash().theme, // available themes are in /css/theme
-				transition: Reveal.getQueryHash().transition || 'default', // default/cube/page/concave/zoom/linear/fade/none
+				transition: Reveal.getQueryHash().transition || 'fade', // default/cube/page/concave/zoom/linear/fade/none
 
 				// Parallax scrolling
 				// parallaxBackgroundImage: 'https://s3.amazonaws.com/hakim-static/reveal-js/reveal-parallax-1.jpg',
@@ -138,36 +176,34 @@
 			render: function() {
 				if(this.state == null || this.state.status == 0) {
 					return (
-						<p className="highlight-red">NO ...</p>
+						<p className="status-no">NEI...</p>
 					);
 				} else {
 					return (
-						<p className="highlight-green">Yup!</p>
+						<p className="status-go">Yup!</p>
 					);
 				}
 			}
 		});
 
-		/*Reveal.addEventListener('query-server-status', function() {
+		Reveal.addEventListener('query-server-status', function() {
 			React.renderComponent(
 				<CentralStatus url="http://0.0.0.0:12355/?action=status" />,
 				document.getElementById('central-status-indicator')
 			);	
-		});*/
+		});
 
-		// A signle sensor entry
+		// A single sensor entry
 		var SensorQueue = React.createClass({
 			render: function() {
 				var registrations = this.props.queue.map(function(entry) {
-					return (<li>{entry.device}</li>)
+					return (<tr><td>{entry.device}</td></tr>)
 				});
 				return (
-					<li>
-						<ul>
-							<li className="name">{this.props.name}</li>
-							{registrations}
-						</ul>
-					</li>
+					<table>
+						<tr><th>{this.props.name}</th></tr>
+						{registrations}
+					</table>
 				);
 			}
 		});
@@ -195,7 +231,7 @@
 			render: function() {
 				var sensorQueue = function(name, queue) {
 					return (
-						<SensorQueue name={name} queue={queue} />
+						<td><SensorQueue name={name} queue={queue} /></td>
 					);
 				}
 
@@ -204,17 +240,21 @@
 					data.push(sensorQueue(sensor, this.state.data[sensor]));
 				}
 				return (
-					<ul className="sensors">
-						{data}
-					</ul>
+					<div className="sensors">
+					    <table>
+					        <tr>
+        						{data}
+        					</tr>
+						</table>
+					</div>
 				);
 			}
 		});
 
-		Reveal.addEventListener('query-server-status', function() {
+		Reveal.addEventListener('start-sensor-queue', function() {
 			React.renderComponent(
 				<SensorTable/>,
-				document.getElementById('central-status-indicator')
+				document.getElementById('central-sensor-queue')
 			);	
 		});
 		</script>
