@@ -58,9 +58,9 @@ abstract public class Config {
 		
 		// Add static routes
 		ipBMacMapping.put("192.168.1.201", "f8:db:7f:04:a0:71");
-		deviceAliases.put("f8:db:7f:04:a0:71", "htc-desire");
+		deviceAliases.put("f8:db:7f:04:a0:71", "desire");
 		ipBMacMapping.put("192.168.1.200", "a8:26:d9:f2:dc:27");
-		deviceAliases.put("a8:26:d9:f2:dc:27", "htc-one");		
+		deviceAliases.put("a8:26:d9:f2:dc:27", "one");		
 		ipBMacMapping.put("192.168.1.202", "cc:fa:00:58:03:81");
 		deviceAliases.put("cc:fa:00:58:03:81", "nexus5");
 	}

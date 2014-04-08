@@ -70,6 +70,8 @@ public class CentralAVTransportService extends AbstractAVTransportService {
 			return;
 		}
 		
+		final URI currentURI = this.currentURI;
+		
 		new Thread() {
 			public void run() {
 				try {

@@ -45,7 +45,7 @@ public class Central {
 		// JSON API server
 		api_server = new ApiServer(12355, this);
 		api_server.setDaemon(true);
-		//api_server.start();
+		api_server.start();
 		
 		// Device socket for sensors and primitive TCP players
 		deviceServerSocket = new DeviceServerSocket(this);

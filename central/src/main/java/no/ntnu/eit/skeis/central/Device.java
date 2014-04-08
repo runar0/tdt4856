@@ -62,7 +62,7 @@ public class Device implements Comparable<Device> {
 		 */
 		public double getDistance() {
 			// Age reading by 1 meter per 10 s TODO evaluate!
-			double age = (System.currentTimeMillis()-timestamp) / 10000.0;
+			double age = (System.currentTimeMillis()-timestamp) / 15000.0;
 			return distance + age;
 		}
 	}
