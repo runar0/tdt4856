@@ -18,6 +18,7 @@ import java.util.Set;
 import java.util.logging.Logger;
 
 import javazoom.jl.converter.Converter;
+import no.ntnu.eit.skeis.central.Config;
 import no.ntnu.eit.skeis.central.Device;
 import no.ntnu.eit.skeis.central.audio.mp3.Frame;
 
@@ -234,7 +235,8 @@ public class StreamingSource implements AudioSource {
 	@Override
 	public String getHttpUrl() {
 		try {
-			return "http://"+InetAddress.getLocalHost().getHostAddress()+":"+server.getLocalPort();
+			//return "http://"+InetAddress.getLocalHost().getHostAddress()+":"+server.getLocalPort();
+			return "http://"+Config.IP+":"+server.getLocalPort();
 		} catch(Exception e) {
 			return "";
 		}
@@ -243,7 +245,8 @@ public class StreamingSource implements AudioSource {
 	@Override
 	public String getSonosUrl() {
 		try {
-			return "x-rincon-mp3radio://"+InetAddress.getLocalHost().getHostAddress()+":"+server.getLocalPort();
+			// TODO HARDCODED!
+			return "x-rincon-mp3radio://"+Config.IP+":"+server.getLocalPort();
 		} catch(Exception e) {
 			return "";
 		}

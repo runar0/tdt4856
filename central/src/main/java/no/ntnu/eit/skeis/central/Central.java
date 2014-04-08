@@ -33,6 +33,8 @@ public class Central {
 	public Central() throws Exception {
 		log = Logger.getLogger(getClass().getName());
 		
+		log.info("Starting central at "+Config.IP);
+		
 		// Basic managers
 		sensor_manager = new SensorManager();		
 		player_manager = new PlayerManager();

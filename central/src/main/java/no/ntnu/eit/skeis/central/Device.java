@@ -51,7 +51,8 @@ public class Device implements Comparable<Device> {
 			if(this.distance >= INFINITY) {
 				this.distance = distance;
 			} else {
-				this.distance = this.distance + Config.SENSOR_READING_COEFF * (distance - this.distance);
+				//this.distance = this.distance + Config.SENSOR_READING_COEFF * (distance - this.distance);
+				this.distance = (1-Config.SENSOR_READING_COEFF)*this.distance + Config.SENSOR_READING_COEFF*distance;
 			}
 			timestamp = System.currentTimeMillis();
 		}

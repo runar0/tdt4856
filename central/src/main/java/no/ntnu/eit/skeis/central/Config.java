@@ -1,5 +1,6 @@
 package no.ntnu.eit.skeis.central;
 
+import java.net.Inet4Address;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -12,7 +13,25 @@ import java.util.Map;
  */
 abstract public class Config {
 
-	public static final double SENSOR_READING_COEFF = 0.15;
+	public static final double SENSOR_READING_COEFF = 0.75;
+	
+	public static final boolean ONLY_KNOWN_DEVICES = true;
+	
+	/**
+	 * We experience quite a bit of delay when getting the ip at times, causing issues with speaker switching.
+	 * Hence we store it here
+	 */
+	public static String IP;
+	
+	static {
+		try {
+			IP  = Inet4Address.getLocalHost().getHostAddress();
+		} catch(Exception e) {
+			System.err.println("Cannot detect central IP!");
+			e.printStackTrace();
+			System.exit(1);
+		}
+	}
 	
 	/**
 	 * Static mapping between wifi ips and bluetooth mac addresses
@@ -33,15 +52,15 @@ abstract public class Config {
 	public static Map<String, String> upnpAliases = new HashMap<String, String>();
 	
 	static {
-		upnpAliases.put("RINCON_B8E93758042E01400", "sonos1");
-		upnpAliases.put("RINCON_B8E937581CDC01400", "sonos2");
+		// Our two SONOS PLAY:1's
+		upnpAliases.put("RINCON_B8E93758042E01400", "left");
+		upnpAliases.put("RINCON_B8E937581CDC01400", "right");
 		
+		// Add static routes
 		ipBMacMapping.put("192.168.1.201", "f8:db:7f:04:a0:71");
 		deviceAliases.put("f8:db:7f:04:a0:71", "htc-desire");
-
 		ipBMacMapping.put("192.168.1.200", "a8:26:d9:f2:dc:27");
-		deviceAliases.put("a8:26:d9:f2:dc:27", "htc-one");
-		
+		deviceAliases.put("a8:26:d9:f2:dc:27", "htc-one");		
 		ipBMacMapping.put("192.168.1.202", "cc:fa:00:58:03:81");
 		deviceAliases.put("cc:fa:00:58:03:81", "nexus5");
 	}
@@ -69,8 +88,13 @@ abstract public class Config {
 	public static Map<String, Map<String, Double>> deviceSensorAValue = new HashMap<String, Map<String, Double>>();
 	
 	static {
-		//deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
-		//deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("runar", 45.0);
+		deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
+		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("sonos2", 55.0);
+		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("sonos1", 65.0);
+		
+		deviceSensorAValue.put("cc:fa:00:58:03:81", new HashMap<String, Double>());
+		deviceSensorAValue.get("cc:fa:00:58:03:81").put("sonos2", 55.0);
+		deviceSensorAValue.get("cc:fa:00:58:03:81").put("sonos1", 65.0);
 	}
 	
 	public static double getClientAValue(String sensor, String device) {

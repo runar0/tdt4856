@@ -204,6 +204,11 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	 */
 	@Override
 	public void onSensorUpdate(String alias, String mac, int rssi) {
+		// Filter out unknown devices if requested to
+		if(Config.ONLY_KNOWN_DEVICES && !Config.deviceAliases.containsKey(mac)) {
+			return;
+		}
+		
 		// Create a new device entry if none exists
 		if (!devices.containsKey(mac)) {
 			Device device = new Device(mac, this);
