@@ -1,6 +1,5 @@
 <!doctype html>
-<html lang="en">
-
+<html lang="no">
 	<head>
 		<meta charset="utf-8">
 
@@ -8,6 +7,7 @@
 
 		<meta name="description" content="Presentation of TRACKbox prototype">
 		<meta name="author" content="Runar B. Olsen">
+		<meta name="author" content="Team SKEIS">
 
 		<meta name="apple-mobile-web-app-capable" content="yes" />
 		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
@@ -18,7 +18,7 @@
 		<!--<link rel="stylesheet" href="css/theme/default.css" id="theme">-->
 
 		<!-- For syntax highlighting -->
-		<link rel="stylesheet" href="lib/css/zenburn.css">
+		<!--<link rel="stylesheet" href="lib/css/zenburn.css">-->
 
 		<!-- If the query includes 'print-pdf', include the PDF print sheet -->
 		<script>
@@ -48,11 +48,11 @@
 		<div class="reveal">
 
 			<!-- Any section element inside of this container is displayed as a slide -->
-			<div class="slides">
+			<div class="slides">				
 				<section class="only-header">
 					<h1>TRACKbox <br><small>Prototype</small></h1>
 				</section>
-
+				
 				<section data-state="query-server-status">
 					<h1>KLAR?</h1>
 
@@ -63,7 +63,6 @@
 				    <h1>VISJON</h1>
 				    <ul>
 				        <li>Vise at konseptet er realisitsk</li>
-				        <li>Innen satt tidsramme</li>
 				    </ul>
 				</section>
 				
@@ -92,14 +91,13 @@
 					<h1>FLERE SENSORER</h1>
 					<ul>
 						<li>'Nærmeste sensor'</li>
-						<li>Prioriteringer
-						</li>
+						<li>Prioriteringer</li>
 					</ul>
 
 					<div id="central-sensor-queue"></div>
 				</section>
 
-				<section data-state="stop-poll">
+				<section>
 					<h1>AVSPILLERE</h1>
 
 					<ul>
@@ -123,8 +121,12 @@
 					</ul>
 				</section>
 
-				<section class="only-header">
+				<section class="only-header" data-state="stop-poll">
 					<h1>DEMO <br><small>Fingers crossed</small></h1>
+				</section>	
+				
+				<section>
+					<h1>OPPSUMMERING</h1>
 				</section>	
 
 			</div>
@@ -175,7 +177,12 @@
 		<script type="text/jsx">
 		/** @jsx React.DOM */	
 
-		// Are we ready to go widget
+        Reveal.addEventListener('stop-poll', function() {
+            clearInterval(window.deviceReadingsPoll);
+            clearInterval(window.sensorQueuesPoll);
+		});
+
+		// Are we ready to go?-widget
 		var CentralStatus = React.createClass({
 			componentWillMount: function() {
 				$.ajax({
@@ -226,19 +233,11 @@
 			},
 
 			componentWillMount: function() {
-				this.setState({data: {}});
+				this.setState({data: {left: 0, right: 0}});
 				this.loadSensorDataFromServer();
-    			setInterval(this.loadSensorDataFromServer, 2000);
+    			window.deviceReadingsPoll = setInterval(this.loadSensorDataFromServer, 1000);
 			},
-			render: function() {
-				//var sensorQueue = function(name, queue) {
-				//	return (
-				//		<td key={name}><SensorQueue name={name} queue={queue} /></td>
-				//	);
-				//}
-				
-				console.log(this.state.data);
-				
+			render: function() {	
 				var outerStyle = {
 				    'background-color': '#579cb7',
 				    'width': '100%',
@@ -249,9 +248,16 @@
 				    'background-color': '#f3cd6e',
 				    'width': (this.state.pos != undefined ? this.state.pos.left*100+"%" : "50%"),
 				    };
+				var image = "speaker_left.png";
+				var imageStyle = {
+				    'height': '50px',
+				    'float': 'left'
+				};
 				return (
-					<div className="progress-bar" style={outerStyle}>					    
-                        <div style={innerStyle}>&nbsp;</div>
+				    <div className="progress-container">
+					    <div className="progress-bar" style={outerStyle}>		
+                            <div style={innerStyle}>&nbsp;</div>
+					    </div>
 					</div>
 				);
 			}
@@ -298,7 +304,7 @@
 			componentWillMount: function() {
 				this.setState({data: {}});
 				this.loadSensorDataFromServer();
-    			setInterval(this.loadSensorDataFromServer, 2000);
+    			window.sensorQueuesPoll = setInterval(this.loadSensorDataFromServer, 2000);
 			},
 			render: function() {
 				var sensorQueue = function(name, queue) {

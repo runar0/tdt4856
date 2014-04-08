@@ -71,7 +71,8 @@ abstract public class Config {
 	public static Map<String, Double> sensorNValues = new HashMap<String, Double>();
 	
 	static {
-		sensorNValues.put("runar", 0.2);
+		sensorNValues.put("right", 0.2);
+		sensorNValues.put("left", 0.2);
 	}
 	
 	public static double getSensorNValue(String sensor) {
@@ -89,12 +90,12 @@ abstract public class Config {
 	
 	static {
 		deviceSensorAValue.put("a8:26:d9:f2:dc:27", new HashMap<String, Double>());
-		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("sonos2", 55.0);
-		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("sonos1", 65.0);
+		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("left", 67.0);
+		deviceSensorAValue.get("a8:26:d9:f2:dc:27").put("right", 58.0);
 		
 		deviceSensorAValue.put("cc:fa:00:58:03:81", new HashMap<String, Double>());
-		deviceSensorAValue.get("cc:fa:00:58:03:81").put("sonos2", 55.0);
-		deviceSensorAValue.get("cc:fa:00:58:03:81").put("sonos1", 65.0);
+		deviceSensorAValue.get("cc:fa:00:58:03:81").put("left", 67.0);
+		deviceSensorAValue.get("cc:fa:00:58:03:81").put("right", 58.0);
 	}
 	
 	public static double getClientAValue(String sensor, String device) {
