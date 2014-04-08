@@ -60,6 +60,14 @@
 				</section>
 				
 				<section>
+				    <h1>VISJON</h1>
+				    <ul>
+				        <li>Vise at konseptet er realisitsk</li>
+				        <li>Innen satt tidsramme</li>
+				    </ul>
+				</section>
+				
+				<section>
 					<h1>OPPSETT</h1>
 					<ul>
 						<li>Sensorer</li>
@@ -69,7 +77,7 @@
 					</ul>
 				</section>
 
-				<section>
+				<section data-state="query-device-readings">
 					<h1>SENSOR</h1>
 					<ul>
 						<li>Bluetooth skann</li>
@@ -77,7 +85,7 @@
 						<li>Omregning til distanse</li>
 						<li>Nødvendigheten av nøyaktige målinger</li>
 					</ul>
-					<small>Legg til avstandsmålinger for en mobil her, (S1---|------S2)</small>
+					<div id="device-readings"></div>
 				</section>
 
 				<section data-state="start-sensor-queue">
@@ -91,7 +99,7 @@
 					<div id="central-sensor-queue"></div>
 				</section>
 
-				<section>
+				<section data-state="stop-poll">
 					<h1>AVSPILLERE</h1>
 
 					<ul>
@@ -105,6 +113,14 @@
 					<h1>SENTRALENHET</h1>
 
 					<img src="arch.png" alt="System architecture" />
+				</section>
+				
+				<section>
+					<h1>LYDKILDER</h1>
+                    <ul>
+						<li>Nettradio</li>
+						<li>DLNA</li>
+					</ul>
 				</section>
 
 				<section class="only-header">
@@ -192,17 +208,73 @@
 				document.getElementById('central-status-indicator')
 			);	
 		});
+		
+		// Device readings
+		var DeviceReadings = React.createClass({
+		    loadSensorDataFromServer: function (){
+				$.ajax({
+					url: "http://0.0.0.0:12355/?action=device-readings&mac=cc:fa:00:58:03:81",
+					dataType: 'json',
+					success: function(data) {
+					    var total = data['left'] + data['right'];
+						this.setState({pos: {'left': data['left']/total, 'right': data['right']/total}, 'data': data});
+					}.bind(this),
+					error: function(xhr, status, err) {
+						this.setState({data: null});
+					}.bind(this)
+				});
+			},
+
+			componentWillMount: function() {
+				this.setState({data: {}});
+				this.loadSensorDataFromServer();
+    			setInterval(this.loadSensorDataFromServer, 2000);
+			},
+			render: function() {
+				//var sensorQueue = function(name, queue) {
+				//	return (
+				//		<td key={name}><SensorQueue name={name} queue={queue} /></td>
+				//	);
+				//}
+				
+				console.log(this.state.data);
+				
+				var outerStyle = {
+				    'background-color': '#579cb7',
+				    'width': '100%',
+				    'height': '10%',
+				    'margin-top': '10%'
+				    };
+				var innerStyle = {
+				    'background-color': '#f3cd6e',
+				    'width': (this.state.pos != undefined ? this.state.pos.left*100+"%" : "50%"),
+				    };
+				return (
+					<div className="progress-bar" style={outerStyle}>					    
+                        <div style={innerStyle}>&nbsp;</div>
+					</div>
+				);
+			}
+		});
+		Reveal.addEventListener('query-device-readings', function() {
+		    React.renderComponent(
+				<DeviceReadings />,
+				document.getElementById('device-readings')
+			);	
+		});
 
 		// A single sensor entry
 		var SensorQueue = React.createClass({
 			render: function() {
 				var registrations = this.props.queue.map(function(entry) {
-					return (<tr><td>{entry.device}</td></tr>)
+					return (<tr key={entry.device}><td>{entry.device}</td></tr>)
 				});
 				return (
 					<table>
+					<tbody>
 						<tr><th>{this.props.name}</th></tr>
 						{registrations}
+						</tbody>
 					</table>
 				);
 			}
@@ -231,7 +303,7 @@
 			render: function() {
 				var sensorQueue = function(name, queue) {
 					return (
-						<td><SensorQueue name={name} queue={queue} /></td>
+						<td key={name}><SensorQueue name={name} queue={queue} /></td>
 					);
 				}
 
@@ -242,9 +314,11 @@
 				return (
 					<div className="sensors">
 					    <table>
+					        <tbody>
 					        <tr>
         						{data}
         					</tr>
+        					</tbody>
 						</table>
 					</div>
 				);
@@ -253,7 +327,7 @@
 
 		Reveal.addEventListener('start-sensor-queue', function() {
 			React.renderComponent(
-				<SensorTable/>,
+				<SensorTable />,
 				document.getElementById('central-sensor-queue')
 			);	
 		});
