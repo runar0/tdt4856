@@ -190,7 +190,7 @@ public class StreamingSource implements AudioSource {
 				
 				if (time != -1) {
 					long diff = 25+System.currentTimeMillis()-time;
-					try { Thread.sleep(diff); } catch(Exception e) {}
+					try { Thread.sleep(diff, 800); } catch(Exception e) {}
 				}
 				time = System.currentTimeMillis();
 			}
