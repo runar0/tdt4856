@@ -23,16 +23,31 @@ public class Bluez {
 	private static Thread readThread;
 	private static boolean stopping = false;
 	
-	public static void startScan(final ResponseListener listener) throws IOException {
+	private static String device;
+	
+	public static void startScan(final String device, final ResponseListener listener) throws IOException {
 		if (running) {
 			//throw new IOException("Scan already started!");
 		}
+		Bluez.device = device;
 		stopping = false;
 
 		Logger.getLogger("Bluez").finest("Attempting to enable periodic bluetooth scan");
 		
+		// Bring up interface
+		Process p = Runtime.getRuntime().exec("hciconfig "+device+" up");
+		while(true) {
+			try {
+				if (p.waitFor() != 0) {
+					throw new IOException("Unable bring bluetooth interface up, do you have root?");
+				}
+				break;
+			} catch(InterruptedException e) {
+				// Ignore and loop around
+			}
+		}
 		// Start periodic can mode
-		Process p = Runtime.getRuntime().exec("hcitool cmd 01 0003 0A 00 09 00 33 8b 9e 08 00");		
+		p = Runtime.getRuntime().exec("hcitool cmd 01 0003 0A 00 09 00 33 8b 9e 08 00");		
 		while(true) {
 			try {
 				if (p.waitFor() != 0) {
@@ -53,7 +68,7 @@ public class Bluez {
 				super.run();
 				
 				try {
-					Process scan = Runtime.getRuntime().exec("hcidump -X");
+					Process scan = Runtime.getRuntime().exec("hcidump -X -i "+device);
 					
 					BufferedReader in = new BufferedReader(new InputStreamReader(scan.getInputStream()));
 					String line;
@@ -91,18 +106,30 @@ public class Bluez {
 	
 	
 	public static void stopScan() throws IOException {
-		if(!running) {
-			return;
-		}
+		//if(!running) {
+		//	return;
+		//}
 		
 		stopping = true;
 		
-		// Start periodic can mode
+		// Stop periodic can mode
 		Process p = Runtime.getRuntime().exec("hcitool cmd 01 0004");		
 		while(true) {
 			try {
 				if (p.waitFor() != 0) {
 					throw new IOException("Unable to stop periodic scan, do you have root?");
+				}
+				break;
+			} catch(InterruptedException e) {
+				// Ignore and loop around
+			}
+		}
+		// Bring interface down
+		p = Runtime.getRuntime().exec("hciconfig "+device+" down");		
+		while(true) {
+			try {
+				if (p.waitFor() != 0) {
+					throw new IOException("Unable to bring interface down, do you have root?");
 				}
 				break;
 			} catch(InterruptedException e) {
