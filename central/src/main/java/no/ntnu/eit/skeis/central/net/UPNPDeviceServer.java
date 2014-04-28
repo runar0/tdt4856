@@ -117,7 +117,6 @@ public class UPNPDeviceServer extends Thread {
 		CentralMediaRenderer renderer = new CentralMediaRenderer(central, Config.NUM_MEDIA_RENDERERS);
 		for(LocalDevice device : renderer.getDevices()) {
 			upnp.getRegistry().addDevice(device);
-			System.out.println(device);
 		}
 		
 		// Keep scanning for devices at regular intervals

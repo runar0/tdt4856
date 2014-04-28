@@ -106,10 +106,28 @@ public class DeviceTracker implements SensorManager.SensorEventListener, Device.
 	private final Central central;
 	
 			
+	@SuppressWarnings("serial")
 	public DeviceTracker(final Central central) {
 		this.central = central;
 		devices = new HashMap<String, Device>();
-		sensorRegistrations = Collections.synchronizedMap(new HashMap<String, SortedSet<DeviceSensorEntry>>());
+		sensorRegistrations = Collections.synchronizedMap(new HashMap<String, SortedSet<DeviceSensorEntry>>() {
+			public String toString() {
+				StringBuilder builder = new StringBuilder();
+				
+				builder.append('{');
+				for(String key : keySet()) {
+					// Append @ if there is a player connected to this sensor, otherwise -
+					builder.append(central.getPlayerManager().getPlayer(key) != null ? '@' : '-');
+					builder.append(key);
+					builder.append('=');
+					builder.append(get(key).toString());
+					builder.append(',');
+				}
+				builder.deleteCharAt(builder.length()-1);
+				builder.append('}');
+				return builder.toString();
+			}
+		});
 		
 		central.getSensorManager().addListener(this);
 		

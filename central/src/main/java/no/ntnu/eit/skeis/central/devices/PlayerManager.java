@@ -66,6 +66,12 @@ public class PlayerManager {
 		}
 	}
 
+	/**
+	 * Get player identified by alias, or null if no matching player can be found
+	 * 
+	 * @param alias
+	 * @return
+	 */
 	public PlayerInterface getPlayer(String alias) {
 		return players.get(alias);
 	}
